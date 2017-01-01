@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Taeguk Shell</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://taeguk.github.io">
+    <meta property="og:title" content="Taeguk Shell">
+    <meta property="og:description" content="Welcome to a dreaming nerd's website!">
+    <meta property="og:image" content="assets/images/pfp.png">
+		<link rel="icon" href="assets/images/pfp.png" type="image/png">
+    <link rel="stylesheet" type="text/css" href="terminal.css"/>
+  </head>
+  <body>
+    <main id="container">
+      <div id="terminal">
+        <!-- Terminal Bar -->
+        <section id="terminal__bar">
+          <div id="bar__buttons">
+            <button class="bar__button" id="bar__button--exit">&#10005;</button>
+            <button class="bar__button">&#9472;</button>
+            <button class="bar__button">&#9723;</button>
+          </div>
+          <p id="bar__user">thai@crypto: <span class='current_location'>/</span></p>
+        </section>
+        <!-- Terminal Body -->
+        <section id="terminal__body">
+          <div id="terminal__prompt">
+            <pre id="terminal__prompt--logo-large" style="font-family: 'Courier New'">
+ ▄▄▄█████▓ ▄▄▄      ▓█████   ▄████  █    ██  ██ ▄█▀     ██████  ██░ ██ ▓█████  ██▓     ██▓    
+ ▓  ██▒ ▓▒▒████▄    ▓█   ▀  ██▒ ▀█▒ ██  ▓██▒ ██▄█▒    ▒██    ▒ ▓██░ ██▒▓█   ▀ ▓██▒    ▓██▒    
+ ▒ ▓██░ ▒░▒██  ▀█▄  ▒███   ▒██░▄▄▄░▓██  ▒██░▓███▄░    ░ ▓██▄   ▒██▀▀██░▒███   ▒██░    ▒██░    
+ ░ ▓██▓ ░ ░██▄▄▄▄██ ▒▓█  ▄ ░▓█  ██▓▓▓█  ░██░▓██ █▄      ▒   ██▒░▓█ ░██ ▒▓█  ▄ ▒██░    ▒██░    
+   ▒██▒ ░  ▓█   ▓██▒░▒████▒░▒▓███▀▒▒▒█████▓ ▒██▒ █▄   ▒██████▒▒░▓█▒░██▓░▒████▒░██████▒░██████▒
+   ▒ ░░    ▒▒   ▓▒█░░░ ▒░ ░ ░▒   ▒ ░▒▓▒ ▒ ▒ ▒ ▒▒ ▓▒   ▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒░░ ▒░ ░░ ▒░▓  ░░ ▒░▓  ░
+     ░      ▒   ▒▒ ░ ░ ░  ░  ░   ░ ░░▒░ ░ ░ ░ ░▒ ▒░   ░ ░▒  ░ ░ ▒ ░▒░ ░ ░ ░  ░░ ░ ▒  ░░ ░ ▒  ░
+   ░        ░   ▒      ░   ░ ░   ░  ░░░ ░ ░ ░ ░░ ░    ░  ░  ░   ░  ░░ ░   ░     ░ ░     ░ ░   
+                ░  ░   ░  ░      ░    ░     ░  ░            ░   ░  ░  ░   ░  ░    ░  ░    ░  ░
+            </pre>
+            <pre id="terminal__prompt--logo-small">
+  ____ ____ ____ ____ ____ ____ _________ ____ ____ ____ ____ ____ 
+ ||T |||A |||E |||G |||U |||K |||       |||S |||H |||E |||L |||L ||
+ ||__|||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__|||__||
+ |/__\|/__\|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|/__\|/__\|
+            </pre>
+            <pre id="terminal__prompt--logo-xsmall">
+  ____ ____ ____ ____ ____ ____ 
+ ||T |||A |||E |||G |||U |||K ||
+ ||__|||__|||__|||__|||__|||__||
+ |/__\|/__\|/__\|/__\|/__\|/__\|
+          ____ ____ ____ ____ ____ 
+         ||S |||H |||E |||L |||L ||
+         ||__|||__|||__|||__|||__||
+         |/__\|/__\|/__\|/__\|/__\| 
+            </pre>
+            <div>Enter `help` to get list of all available commands.</div><br/>
+            <div id="executed_commands"></div>
+            <div id="prompt" style="display: inline-block">
+              <span class="terminal__prompt--user">thai@crypto:</span>
+              <span class="terminal__prompt--location current_location">/</span>
+              <span class="terminal__prompt--bling">$</span>
+            </div>
+            <input type="text" autofocus="autofocus" id="terminal__prompt--command">
+            <br/><br/>
+          </div>
+        </section>
+      </div>
+    </main>
+
+	  <!-- error -->
+    <div id="error" class="html_template">
+      {0}: command not found. Enter <b>'help'</b> to get list of all available commands.
+    </div>
+
+    <!-- whoami -->
+    <div id="whoami" class="html_template command">
+      2010: Wrote my first lines of code. <br/>
+      2012: Rookie Hacker. <br/>
+      2015: Liked understanding and programming at the OS level. <br/>
+      2017: C++ & Programming Language Enthusiast. <br/>
+      2019: Fell in love with Functional Programming & Event Sourcing. <br/>
+      2021: Started taking an interest in engineering management and business. <br/>
+      2022: Wandered around startups. <br/>
+      2023: Decided to dedicate myself to crypto for the long term. <br/>
+    </div>
+
+    <!-- careers -->
+    <div id="careers" class="html_template command careers">
+
+      <h3>Sogang University<br/><sub>Graduated</sub></h3>
+      - Bachelor's degree, Computer Science and Engineering <br/>
+
+      <br/><hr/>
+      <h3>Samsung Software Membership<br/><sub>2015.07 - 2016.12</sub></h3>
+      - Researched and developed some projects supported by Samsung Electronics. <br/>
+
+      <br/><hr/>
+      <h3>SuaLab<br/><sub>2017.01 - 2017.02</sub></h3>
+      - Developed an alpha version of industrial image analysis software (SuaKIT) based on deep learning. <br/>
+
+      <br/><hr/>
+      <h3>Google Summer Of Code<br/><sub>2017.05 - 2017.08</sub></h3>
+      - Contributed to <a href='https://github.com/STEllAR-GROUP/hpx' target='_blank'>HPX (C++ Standard Library for Concurrency and Parallelism)</a> as paid open-source developer supported by Google. <br/>
+      - Implemented parallel algorithms specified in C++17 and above standard. <br/>
+      - Experienced in advanced C++ techniques and future language standards. <br/>
+
+      <br/><hr/>
+      <h3>ESTsoft Corp.<br/><sub>2017.09 - 2019.05</sub></h3>
+      - Redesigned and rewrote an anti-malware engine used by "ALYac". <br/>
+      - Developed "ALYac EDR", mainly an integration with the "Threat Inside" service. <br/>
+      - Maintained and improved common libraries used by various products in a company. <br/>
+
+      <br/><hr/>
+      <h3>Devsisters<br/><sub>2019.06 - 2021.10</sub></h3>
+      - Led the successful global launching of <a href='https://www.cookierun-kingdom.com/' target='_blank'>CookieRun: Kingdom</a> as a backend team lead. <br/>
+      - It is a global service that reached 9 million MAU in 10 months of release and about 40 million users in a year. <br/>
+      - Experienced massive traffic: 360k concurrent users, 55k RPS for server, 60k QPS for DB (mostly write) <br/>
+      - Experienced troubles from massive infra: a database cluster of about a hundred nodes and a game server cluster of tens of nodes. <br/>
+      - Experienced many technical challenges. (<a href='https://www.youtube.com/watch?v=FUEZibcZEkg' target='_blank'>NDC Presentation</a>, <a href='https://devsisters.notion.site/88bcb5f7325c4610a5e728b6b899e9ec' target='_blank'>JD describing some challenges</a>) <br/>
+      - Experienced deeply in various uncommon tech stacks including Scala, Functional Programming, Event Sourcing, and CockroachDB. <br/>
+
+      <br/><hr/>
+      <h3>Devsisters<br/><sub>2021.11 - 2022.05</sub></h3>
+      - Worked as a VP of Server Development for “Studio Kingdom", a subsidiary of Devsisters. <br/>
+      - Represented and supported backend and web engineers across teams in the company. <br/>
+      - Participated in decisions for architecture and tech stacks in the early stage of new game development. <br/>
+      - Supported recruitment, management, and technical cooperation across teams. <br/>
+
+      <br/><hr/>
+      <h3>Lightscale Inc.<br/><sub>2022.05 - 2022.08</sub></h3>
+      - Joined as an early member of a crypto startup and participated in custodial wallet development. <br/>
+      - Worked as a backend team lead. <br/>
+
+      <br/><hr/>
+      <h3>Startup<br/><sub>2022.08 - 2023.06</sub></h3>
+      - Joined as a founding member. <br/>
+      - Developed a new centralized exchange with the acquisition of a crypto exchange with a VASP license. After pivoting, developed a fancy non-custodial wallet. <br/>
+      - Took charge of team building and engineering for the backend, devops, and blockchain. <br/>
+
+      <br/><hr/>
+      <h3>Mitosis Project<br/><sub>2023.07 - NOW</sub></h3>
+      - Working as a head of engineering. <br/>
+      - https://mitosis.org/ <br/>
+    </div>
+
+    <!-- PFP -->
+    <div id="pfp" class="html_template command">
+      <figure style="padding:0; margin: 10px"><img src="assets/images/pfp.png" alt="BAD DEV"/></figure>
+    </div>
+
+    <!-- guk on glass -->
+    <div id="gukonglass" class="html_template command">
+      <figure style="padding:0; margin: 10px"><img src="assets/images/1.jpg" alt="Guk On Glass"/></figure>
+    </div>
+
+    <!-- contact -->
+    <div id="contact" class="html_template command contact">
+      - Twitter &nbsp;:
+        <a href='https://twitter.com/baddest_dev' target='_blank'>https://twitter.com/baddest_dev</a><br/>
+      - Linkedin : 
+        <a href='https://www.linkedin.com/in/taeguk/' target='_blank'>https://www.linkedin.com/in/taeguk/</a><br/>
+      - Github &nbsp;&nbsp;: 
+        <a href='https://github.com/taeguk' target='_blank'>https://github.com/taeguk</a><br/>
+      - Blog &nbsp;&nbsp;&nbsp;&nbsp;: 
+        <a href='https://taeguk2.blogspot.com' target='_blank'>https://taeguk2.blogspot.com</a><br/>
+      - Email &nbsp;&nbsp;&nbsp;:
+        <a href="mailto:xornrbboy@gmail.com">xornrbboy@gmail.com</a><br/>
+      <br/>
+      - KakaoTalk Open Chat <br/>
+        &nbsp;&nbsp;- <a href='https://open.kakao.com/o/sgjqqkf' target='_blank'>https://open.kakao.com/o/sgjqqkf</a> (1:1)<br/>
+        &nbsp;&nbsp;- <a href='https://open.kakao.com/o/gmr4pkf' target='_blank'>https://open.kakao.com/o/gmr4pkf</a> (Group)
+    </div>
+
+    <!-- linkedIn -->
+    <div id="linkedin" class="html_template command">
+      <a href='https://www.linkedin.com/in/taeguk/' target='_blank'>https://www.linkedin.com/in/taeguk/</a>
+    </div>
+  
+    <!-- github -->
+    <div id="github" class="html_template command">
+      <a href='https://github.com/taeguk' target='_blank'>https://github.com/taeguk</a>
+    </div>
+  
+    <!-- blog -->
+    <div id="blog" class="html_template command">
+      <a href='https://taeguk2.blogspot.com' target='_blank'>https://taeguk2.blogspot.com</a>
+    </div>
+  
+    <!-- facebook -->
+    <div id="facebook" class="html_template command">
+      <a href='https://www.facebook.com/xornrbboy' target='_blank'>https://www.facebook.com/xornrbboy</a>
+    </div>
+  
+	  <!-- help -->
+    <div id="help" class="html_template command">
+      Basic Commands <br/>
+      --------------------------- <br/>
+      - whoami, careers, pfp, gukonglass <br/>
+      - contact, linkedin, github, blog, facebook <br/>
+      - help, history, clear, exit <br/>
+      <br/>
+      Remote File System Commands <br/>
+      --------------------------- <br/>
+      - pwd, cd, ls, mkdir, rmdir <br/>
+      - echo, cat, rm, cp <br/>
+      - upload, download <br/>
+      <br/>
+      Tips <br/>
+      --------------------------- <br/>
+      - You can auto complete using tab button. <br/>
+      - You can move your command histories using arrow up and down. <br/>
+      - You can redirect command result to files. (ex, `ls > a.txt`) <br/>
+    </div>
+
+    <!-- history, clear, exit -->
+    <div id="history" class="html_template command"></div>
+    <div id="clear" class="html_template command"></div>
+    <div id="exit" class="html_template command"></div>
+
+    <!-- pwd, cd -->
+    <div id="pwd" class="html_template command"></div>
+    <div id="cd" class="html_template command"></div>
+
+    <!-- ls -->
+    <div id="ls" class="html_template command">
+      usage: ls [directory]
+    </div>
+
+    <!-- mkdir -->
+    <div id="mkdir" class="html_template command">
+      usage: mkdir directories...
+    </div>
+
+    <!-- rmdir -->
+    <div id="rmdir" class="html_template command">
+      usage: rmdir directories...
+    </div>
+
+    <!-- echo -->
+    <div id="echo" class="html_template command"></div>
+
+    <!-- cat -->
+    <div id="cat" class="html_template command">
+      usage: cat file_to_print <br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it can be used only for printing a file.
+    </div>
+
+    <!-- rm -->
+    <div id="rm" class="html_template command">
+      usage: rm files_to_remove...
+    </div>
+
+    <!-- cp -->
+    <div id="cp" class="html_template command">
+      usage: cp source_file target_file
+    </div>
+
+    <!-- upload -->
+    <div id="upload" class="html_template command">
+      upload: specifing target directory is not supported. (will be added soon!)
+    </div>
+
+    <!-- upload -->
+    <div id="download" class="html_template command">
+      NOT IMPLEMENTED YET
+    </div>
+  
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script type='text/javascript' src="browser-app.js"></script>
+  </body>
+</html>

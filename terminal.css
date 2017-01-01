@@ -1,0 +1,232 @@
+/*
+  Originally written by FOBABS. (https://github.com/fobabs/ubuntu-terminal)
+  I copied that and modified for my purposes.
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono');
+
+body {
+  background: linear-gradient(45deg, #57003f 0%,#f57453 100%);
+  font-family: 'Ubuntu';
+  margin: 0;
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#terminal {
+  width: 70vw;
+  height: 65vh;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+}
+
+#terminal__bar {
+  display: flex;
+  width: 100%;
+  height: 30px;
+  align-items: center;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background: linear-gradient(#504b45 0%,#3c3b37 100%);
+}
+
+#bar__buttons {
+  display: flex;
+  align-items: center;
+}
+
+.bar__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin-right: 5px;
+  font-size: 8px;
+  height: 12px;
+  width: 12px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 100%;
+  background: linear-gradient(#7d7871 0%, #595953 100%);
+  text-shadow: 0px 1px 0px rgba(255,255,255,0.2);
+  box-shadow: 0px 0px 1px 0px #41403A, 0px 1px 1px 0px #474642;
+}
+.bar__button:hover {
+  cursor: pointer;
+}
+.bar__button:focus {
+  outline: none;
+}
+#bar__button--exit {
+  background: linear-gradient(#f37458 0%, #de4c12 100%);
+  background-clip: padding-box;
+}
+
+#bar__user {
+  color: #d5d0ce;
+  margin-left: 6px;
+  font-size: 14px;
+  line-height: 15px;
+}
+
+#terminal__body {
+  display: flex;
+  background: rgba(56, 4, 40, 0.9);
+  font-family: 'Ubuntu Mono';
+  color: #dddddd;
+  height: calc(100% - 30px);
+  padding: 3px;
+  margin-top: -1px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#terminal__prompt {
+  width: 100%;
+}
+
+#terminal__prompt--logo-large {
+  display: block;
+  overflow: hidden;
+}
+
+#terminal__prompt--logo-small {
+  display: none;
+  overflow: hidden;
+}
+
+#terminal__prompt--logo-xsmall {
+  display: none;
+  overflow: hidden;
+}
+
+#executed_commands pre {
+  margin: 0;
+}
+
+.terminal__prompt--user {
+  color: #7eda28;
+}
+.terminal__prompt--location {
+  color: #4878c0;
+}
+.terminal__prompt--bling {
+  color: #dddddd;
+}
+#terminal__prompt--command {
+  width: calc(100% - 300px);
+  border: 0;
+  padding: 0;
+  background: inherit;
+  color: #dddddd;
+  outline-width: 0;
+  margin-left: 0;
+}
+.terminal__prompt--cursor {
+  display: inline-block;
+  height: 17px;
+  width: 8px;
+  margin-left: 0;
+  animation: blink 1200ms linear infinite;
+}
+
+pre, input, textarea, select { 
+  font-family: inherit; 
+  font-size: inherit;
+}
+
+.contact a, .careers a {
+  color: inherit;
+}
+
+a:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+.html_template {
+  display: none;
+}
+
+.command img {
+  max-width: 100%;
+  max-height: 50vh;
+  object-fit: scale-down;
+}
+
+@keyframes blink {
+  0% {
+    background: #ffffff;
+  }
+  49% {
+    background: #ffffff;
+  }
+  60% {
+    background: transparent;
+  }
+  99% {
+    background: transparent;
+  }
+  100% {
+    background: #ffffff;
+  }
+}
+
+@media (max-width: 1060px) {
+  #terminal {
+    width: 80vw;
+    height: 70vh;
+  }
+
+  #terminal__prompt--logo-large {
+    display: none;
+  }
+
+  #terminal__prompt--logo-small {
+    display: block;
+  }
+}
+
+@media (max-width: 680px) {
+  #container {
+    width: 100%;
+  }
+
+  #terminal {
+    height: 100%;
+    width: 100%;
+  }
+
+  #terminal__bar {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+
+  #terminal__body {
+    padding: 0;
+  }
+}
+
+@media (max-width: 540px) {
+  #terminal__prompt--command {
+    width: calc(100% - 145px);
+  }
+  #terminal__prompt--logo-large {
+    display: none;
+  }
+
+  #terminal__prompt--logo-small {
+    display: none;
+  }
+
+  #terminal__prompt--logo-xsmall {
+    display: block;
+  }
+}
