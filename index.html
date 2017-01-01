@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Taeguk.me</title>
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+		
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		
+		<!--<link rel="stylesheet" href="assets/css/flip.css">-->
+		<link rel="stylesheet" href="assets/css/flip2.css">
+		<link rel="stylesheet" href="assets/css/common.css">
+		<link rel="stylesheet" href="assets/css/index.css">
+		
+		<script type="text/javascript">
+		</script>
+	</head>
+	<body>
+		<div class='container'>
+			<div id='header' class="page-header">
+				<h1 class="title">
+					<div style='display:inline-block;'><a>Taeguk.me</a></div><div style='display:inline-block;'>&nbsp;<small><small>Website is Beta...</small></small></div>
+				</h1>
+			</div>
+			<div class='row'>
+				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+					<a href='https://www.linkedin.com/in/taeguk'>
+					<div class='elem_box'>
+						<span class='elem_text'>LinkedIn</span>
+					</div>
+					</a>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+					<a href='http://blog.naver.com/likeme96'>
+					<div class='elem_box'>
+						<span class='elem_text'>Blog</span>
+					</div>
+					</a>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+					<a href='https://github.com/taeguk'>
+					<div class='elem_box'>
+						<span class='elem_text'>Github</span>
+					</div>
+					</a>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+					<a href='https://www.facebook.com/xornrbboy'>
+					<div class='elem_box'>
+						<span class='elem_text'>Facebook</span>
+					</div>
+					</a>
+				</div>
+				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+					<a>
+					<div class="hover panel">
+						<div class="front">
+							<div class='elem_box'>
+								<span class='elem_text'>Guest Board</span>
+							</div>
+						</div>
+						<div class="back">
+							<div class='elem_box elem_box_not_supported'>
+								<span class='elem_text'>Not supported</span>
+							</div>
+						</div>
+					</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			function set_elem_box_height() {
+				var w_width = $(window).width();
+				var wh_rate;
+				if(w_width <= 767) wh_rate = 0.3;
+				else if(768 <= w_width && w_width <= 991) wh_rate = 0.5;
+				else if(992 <= w_width && w_width <= 1199) wh_rate = 1;
+				else wh_rate = 1;
+				$('.elem_box').height($('.elem_box').width() * wh_rate);
+				$('.panel').height($('.panel').width() * wh_rate);
+			}
+			$(document).ready(function() {
+				set_elem_box_height();
+				
+				var color_list = ['#ffdead','#87cefa','#ffa500','#f0e68c','#ffd700', '#fa8072' ];
+				var color_idx = 0;
+				$('.elem_box').each(function() {
+					$(this).css('background-color',color_list[color_idx++]);
+				});
+				
+				$('.hover').hover(function(){
+					$(this).addClass('flip');
+				},function(){
+					$(this).removeClass('flip');
+				});
+			});
+			$(window).resize(function() {
+				set_elem_box_height()
+			});
+		</script>
+	</body>
+</html>

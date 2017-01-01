@@ -1,0 +1,93 @@
+body {
+	background-color: #f0f8ff;
+}
+#header {
+}
+.mybrand {
+	display: block;
+	float: left;
+	margin: 0 0 0 0;
+}
+.title {
+	color: #333333;
+	line-height: 100%;
+}
+.elem_box {
+	display: table;
+	width: 100%;
+	text-align: center;
+	border: 1px solid #dddddd;
+	border-radius: 10px;
+	box-shadow: 0 0 5px 5px #f0f8ff;
+}
+.elem_text {
+	color: #333333;
+	display: table-cell;
+	vertical-align: middle;
+	font-weight: bold;
+}
+
+.elem_box:not(.elem_box_not_supported):hover {
+	opacity: 0.6;
+}
+
+/* Extra Small */
+@media (max-width: 767px) {
+	#header {
+		margin-top: 2.5rem;
+	}
+	.title {
+		font-size: 5rem;
+	}
+	.elem_box {
+		margin: 0 0 20px 0;
+	}
+	.elem_text {
+		font-size: 4rem;
+	}
+}
+/* Small */
+@media (min-width: 768px) and (max-width: 991px) {
+	#header {
+		margin-top: 2rem;
+	}
+	.title {
+		font-size: 4rem;
+	}
+	.elem_box {
+		margin: 0 0 30px 0;
+	}
+	.elem_text {
+		font-size: 2rem;
+	}
+}
+/* Medium */
+@media (min-width: 992px) and (max-width: 1199px) {
+	#header {
+		margin-top: 1.5rem;
+	}
+	.title {
+		font-size: 3rem;
+	}
+	.elem_box {
+		margin: 0 0 30px 0;
+	}
+	.elem_text {
+		font-size: 1.33rem;
+	}
+}
+/* Large */
+@media (min-width: 1200px) {
+	#header {
+		margin-top: 1.25rem;
+	}
+	.title {
+		font-size: 2.5rem;
+	}
+	.elem_box {
+		margin: 0 0 30px 0;
+	}
+	.elem_text {
+		font-size: 1rem;
+	}
+}
