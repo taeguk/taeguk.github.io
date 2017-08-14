@@ -1,7 +1,12 @@
 body {
-	background-color: #f0f8ff;
+	background-color: #d0e0e0;
 }
 #header {
+	margin-bottom: 40px;
+	border-bottom: 9px dashed #3070e0;
+	padding-bottom: 12px;
+	border-left: 9px dashed #3070e0;
+	padding-left: 18px;
 }
 .mybrand {
 	display: block;
@@ -9,8 +14,14 @@ body {
 	margin: 0 0 0 0;
 }
 .title {
-	color: #333333;
 	line-height: 100%;
+	margin: 0;
+}
+.title a {
+	color: #303030;
+}
+.title a:hover {
+	color: #202020;
 }
 .elem_box {
 	display: table;
@@ -18,7 +29,7 @@ body {
 	text-align: center;
 	border: 1px solid #dddddd;
 	border-radius: 10px;
-	box-shadow: 0 0 5px 5px #f0f8ff;
+	box-shadow: 0 0 5px 5px #c6d6d6;
 }
 .elem_text {
 	color: #333333;
