@@ -2,11 +2,7 @@ body {
 	background-color: #d0e0e0;
 }
 #header {
-	margin-bottom: 40px;
-	border-bottom: 9px dashed #3070e0;
-	padding-bottom: 12px;
-	border-left: 9px dashed #3070e0;
-	padding-left: 18px;
+	border: 0;
 }
 .mybrand {
 	display: block;
