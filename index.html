@@ -128,6 +128,7 @@
 			.hover14 figure:hover::before {
 				-webkit-animation: shine .75s;
 				animation: shine .75s;
+				animation-delay: .35s;
 			}
 			@-webkit-keyframes shine {
 				100% {
@@ -142,25 +143,23 @@
 			
 			#profile {
 				transition: border-radius .5s ease;
-				width: 600px;
-				height: 250px;
 				background-color: white;
 				background-size: contain;
 				z-index: 1000;
 				border: 0;
-				border-radius: 2.5rem;
+				border-radius: 2rem;
 			}
 
 			#profile:hover {
 				border: 0;
-				border-radius: 2.5rem;
+				border-radius: 2rem;
 				border-top-right-radius: 0;
 				border-bottom-right-radius: 0;
 			}
 
 			#profile img {
 				border: 0;
-				border-radius: 2.5rem;
+				border-radius: 2rem;
 				border-top-right-radius: 0;
 				border-bottom-right-radius: 0;
 			}
@@ -183,15 +182,15 @@
 		<div id='profile' class="card mx-auto centered">
 		  <div class="row no-gutters">
 			<div class="col-md-5 hover01 hover08 hover14">
-				<a target="_blank" href="resume.html"><!--TODO: link-->
+				<a target="_blank" href="https://ask.fm/xornrbboy">
 					<figure><img src="https://avatars2.githubusercontent.com/u/9107889" class="card-img" alt="Profile Image"/></figure>
 				</a>
 			</div>
 			<div class="col-md-7">
 			  <div class="card-body">
 				<h1 class="card-title">Taeguk Kwon</h1>
-				<p class="card-text">안녕하세요.</br> 강아지를 사랑하는 개발자 입니다.</br> 저만 강아지 없습니다.</p>
-				<p class="card-text"><small class="text-muted">xornrbboy@gmail.com</small></p>
+				<p class="card-text">안녕하세요 :)</br> 산업기능요원 현역 복무중입니다^^</br> <span id='d-day'></span></p>
+				<p class="card-text"><small class="text-muted"><a href="mailto:xornrbboy@gmail.com">xornrbboy@gmail.com</a></small></p>
 			  </div>
 			</div>
 		  </div>
@@ -268,6 +267,21 @@
 			$(window).resize(function() {
 				set_elem_box_height();
 				modify_profile();
+			});
+
+			var d_day = new Date("Sep 19, 2020 17:00:00").getTime();
+
+			//1초마다 갱신되도록 함수 생성,실행
+			var x = setInterval(function() {
+				var now = new Date().getTime();
+				var distance = d_day - now;
+
+				var d = Math.floor(distance / (1000 * 60 * 60 * 24));
+				var h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+				var m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+				var s = Math.floor((distance % (1000 * 60)) / 1000);
+
+				$("#d-day").text(d + "일 " + h + "시간 " + m + "분 " + s + "초 남았습니다.");
 			});
 		</script>
 	</body>
