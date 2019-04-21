@@ -1,110 +1,107 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Taeguk.me</title>
+		<title>Taeguk Kwon</title>
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 		<meta name="viewport" content="width=device-width">
 		<link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
 		<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
 		
-		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 		
-		<!--<link rel="stylesheet" href="assets/css/flip.css">-->
-		<link rel="stylesheet" href="assets/css/flip2.css">
 		<link rel="stylesheet" href="assets/css/common.css">
-		<link rel="stylesheet" href="assets/css/index.css">
-		
-		<script type="text/javascript">
-		</script>
+		<style>
+			html, body { height:100%; }
+			
+			.myrow {
+				margin: 0;
+				padding: 0;
+			}
+			
+			.elem-box {
+				height: 50%;
+				margin: 0;
+				padding: 0;
+				text-align: center;
+				color: white;
+				font-size: 50px;
+			}
+			
+			.elem-box a {
+				color: white;
+			}
+			
+			.elem-box:hover {
+				opacity: 0.6;
+			}
+			
+			.mytext-wrap {
+				display: table;
+				width: 100%;
+				height: 100%;
+			}
+			
+			.mytext {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			#linkedin {
+				background-color: #0077B5;
+			}
+			#github {
+				background-color: #24292E;
+			}
+			#blog {
+				background-color: #FF9224;
+			}
+			#facebook {
+				background-color: #4267B2;
+			}
+		</style>
 	</head>
 	<body>
-		<div class='container'>
-			<div id='header' class="page-header">
-				<h1 class="title">
-					<div style='display:inline-block;'><a>Taeguk.me</a></div><div style='display:inline-block;'>&nbsp;<small><small>Makes the way!</small></small></div>
-				</h1>
-			</div>
-			<div class='row'>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+		<div style="width:100%; height:100%">
+			<div class='row myrow'>
+				<div id="linkedin" class="col-12 col-sm-12 col-md-6 elem-box">
 					<a href='https://www.linkedin.com/in/taeguk'>
-					<div class='elem_box'>
-						<span class='elem_text'>LinkedIn</span>
-					</div>
+						<span class="mytext-wrap"><span class="mytext">LinkedIn</span></span>
 					</a>
 				</div>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
-					<a href='https://taeguk2.blogspot.com'>
-					<div class='elem_box'>
-						<span class='elem_text'>Blog</span>
-					</div>
-					</a>
-				</div>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+				<div id="github" class="col-12 col-sm-12 col-md-6 elem-box">
 					<a href='https://github.com/taeguk'>
-					<div class='elem_box'>
-						<span class='elem_text'>Github</span>
-					</div>
+						<span class="mytext-wrap"><span class="mytext">Github</span></span>
 					</a>
 				</div>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
+				
+				<div id="blog" class="col-12 col-sm-12 col-md-6 elem-box">
+					<a href='https://taeguk2.blogspot.com'>
+						<span class="mytext-wrap"><span class="mytext">Blog</span></span>
+					</a>
+				</div>
+				<div id="facebook" class="col-12 col-sm-12 col-md-6 elem-box">
 					<a href='https://www.facebook.com/xornrbboy'>
-					<div class='elem_box'>
-						<span class='elem_text'>Facebook</span>
-					</div>
-					</a>
-				</div>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
-					<a href='https://twitter.com/xornrbboy'>
-					<div class='elem_box'>
-						<span class='elem_text'>Twitter</span>
-					</div>
-					</a>
-				</div>
-				<div class='col-xs-12 col-sm-6 col-md-4 col-lg-3'>
-					<a>
-					<div class="hover panel">
-						<div class="front">
-							<div class='elem_box'>
-								<span class='elem_text'>Guest Board</span>
-							</div>
-						</div>
-						<div class="back">
-							<div class='elem_box elem_box_not_supported'>
-								<span class='elem_text'>Not supported</span>
-							</div>
-						</div>
-					</div>
+						<span class="mytext-wrap"><span class="mytext">Facebook</span></span>
 					</a>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript">
 			function set_elem_box_height() {
-				var w_width = $(window).width();
-				var wh_rate;
-				if(w_width <= 767) wh_rate = 0.3;
-				else if(768 <= w_width && w_width <= 991) wh_rate = 0.5;
-				else if(992 <= w_width && w_width <= 1199) wh_rate = 1;
-				else wh_rate = 1;
-				$('.elem_box').height($('.elem_box').width() * wh_rate);
-				$('.panel').height($('.panel').width() * wh_rate);
+				var window_width = $(window).width();
+				var window_height = $(window).height();
+				
+				var elem_height;
+				if (window_width < 768) elem_height = window_height / 4;
+				else 				 elem_height = window_height / 2; 
+				
+				$('.elem-box').height(elem_height);
 			}
 			$(document).ready(function() {
-				set_elem_box_height();
-				
-				var color_list = ['#e95e93','#7387f0','#95c731','#57b0ea','#f8a000','#95705a','#ff7032','#fa8072' ];
-				var color_idx = 0;
-				$('.elem_box').each(function() {
-					$(this).css('background-color',color_list[color_idx++]);
-				});
-				
-				$('.hover').hover(function(){
-					$(this).addClass('flip');
-				},function(){
-					$(this).removeClass('flip');
-				});
+				set_elem_box_height()
 			});
 			$(window).resize(function() {
 				set_elem_box_height()
