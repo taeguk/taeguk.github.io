@@ -12,9 +12,31 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 		
-		<link rel="stylesheet" href="assets/css/common.css">
-		<style>
-			html, body { height:100%; }
+		<style>		
+			/*
+				@screen-xs-max: 767px;
+				@screen-sm-min: 768px;
+				@screen-sm-max: 991px;
+				@screen-md-min: 992px;
+				@screen-md-max: 1199px;
+				@screen-lg-min: 1200px;
+			*/
+			
+			@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+			@import url(https://fonts.googleapis.com/earlyaccess/jejugothic.css);
+
+			* {
+				/* font-family: 'Nanum Gothic', serif; */
+				font-family: 'Jeju Gothic', serif;
+			}
+
+			html, body {
+				height:100%;
+			}
+			
+			a , a:hover {
+				text-decoration: none;
+			}
 			
 			.myrow {
 				margin: 0;
@@ -49,6 +71,45 @@
 				vertical-align: middle;
 			}
 			
+			.centered {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				/* bring your own prefixes */
+				transform: translate(-50%, -50%);
+			}
+			
+			.img-hover-zoom {
+				overflow: hidden;
+				width: 100%;
+				border-radius: calc(.25rem - 1px);
+			}
+
+			.img-hover-zoom img {
+				transition: transform .5s ease;
+			}
+
+			.img-hover-zoom:hover img {
+				transform: scale(1.2);
+			}
+			
+			#profile {
+				width: 600px;
+				height: 250px;
+				background-color: white;
+				background-size: contain;
+				z-index: 1000;
+				border: 0;
+				border-radius: 2.5rem;
+			}
+			
+			#profile img {
+				border: 0;
+				border-radius: 2.5rem;
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+			
 			#linkedin {
 				background-color: #0077B5;
 			}
@@ -64,6 +125,22 @@
 		</style>
 	</head>
 	<body>
+		<div id='profile' class="card mx-auto centered">
+		  <div class="row no-gutters">
+			<div class="col-md-5 img-hover-zoom">
+				<a target="_blank" href="resume.html">
+					<img src="https://avatars2.githubusercontent.com/u/9107889" class="card-img" alt="Profile Image">
+				</a>
+			</div>
+			<div class="col-md-7">
+			  <div class="card-body">
+				<h1 class="card-title">Taeguk Kwon</h1>
+				<p class="card-text">안녕하세요.</br> 강아지를 사랑하는 개발자 입니다.</br> 저만 강아지 없습니다.</p>
+				<p class="card-text"><small class="text-muted">xornrbboy@gmail.com</small></p>
+			  </div>
+			</div>
+		  </div>
+		</div>
 		<div style="width:100%; height:100%">
 			<div class='row myrow'>
 				<div id="linkedin" class="col-12 col-sm-12 col-md-6 elem-box">
@@ -76,7 +153,6 @@
 						<span class="mytext-wrap"><span class="mytext">Github</span></span>
 					</a>
 				</div>
-				
 				<div id="blog" class="col-12 col-sm-12 col-md-6 elem-box">
 					<a href='https://taeguk2.blogspot.com'>
 						<span class="mytext-wrap"><span class="mytext">Blog</span></span>
@@ -100,11 +176,43 @@
 				
 				$('.elem-box').height(elem_height);
 			}
+			function modify_profile() {
+				var window_width = $(window).width();
+				
+				var profile_width;
+				var root_font_size;
+				
+				if(window_width <= 767) {
+					// hide profile
+					$('#profile').hide();
+					return;
+				}
+				else if(768 <= window_width && window_width <= 991) {
+					profile_width = 460;
+					root_font_size = '14px';
+				}
+				else if(992 <= window_width && window_width <= 1199) {
+					profile_width = 530;
+					root_font_size = '16px';
+				}
+				else {
+					profile_width = 600;
+					root_font_size = '18px';
+				}
+				
+				$('html').css('font-size', root_font_size);
+				$('#profile').width(profile_width);
+				$('#profile').height(profile_width * 5 / 12);
+				$('#profile').show();
+			}
+			
 			$(document).ready(function() {
-				set_elem_box_height()
+				set_elem_box_height();
+				modify_profile();
 			});
 			$(window).resize(function() {
-				set_elem_box_height()
+				set_elem_box_height();
+				modify_profile();
 			});
 		</script>
 	</body>
