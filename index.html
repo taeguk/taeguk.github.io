@@ -79,21 +79,69 @@
 				transform: translate(-50%, -50%);
 			}
 			
-			.img-hover-zoom {
+			figure {
 				overflow: hidden;
-				width: 100%;
-				border-radius: calc(.25rem - 1px);
 			}
 
-			.img-hover-zoom img {
-				transition: transform .5s ease;
+			/* Zoom In #1 */
+			.hover01 figure img {
+				-webkit-transform: scale(1);
+				transform: scale(1);
+				-webkit-transition: .3s ease-in-out;
+				transition: .3s ease-in-out;
+			}
+			.hover01 figure:hover img {
+				-webkit-transform: scale(1.3);
+				transform: scale(1.3);
 			}
 
-			.img-hover-zoom:hover img {
-				transform: scale(1.2);
+			/* Gray Scale */
+			.hover08 figure img {
+				-webkit-filter: grayscale(100%);
+				filter: grayscale(100%);
+				-webkit-transition: .3s ease-in-out;
+				transition: .3s ease-in-out;
+			}
+			.hover08 figure:hover img {
+				-webkit-filter: grayscale(0);
+				filter: grayscale(0);
+			}
+
+			/* Shine */
+			.hover14 figure {
+				position: relative;
+			}
+			.hover14 figure::before {
+				position: absolute;
+				top: 0;
+				left: -75%;
+				z-index: 2;
+				display: block;
+				content: '';
+				width: 50%;
+				height: 100%;
+				background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+				background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+				-webkit-transform: skewX(-25deg);
+				transform: skewX(-25deg);
+			}
+			.hover14 figure:hover::before {
+				-webkit-animation: shine .75s;
+				animation: shine .75s;
+			}
+			@-webkit-keyframes shine {
+				100% {
+					left: 125%;
+				}
+			}
+			@keyframes shine {
+				100% {
+					left: 125%;
+				}
 			}
 			
 			#profile {
+				transition: border-radius .5s ease;
 				width: 600px;
 				height: 250px;
 				background-color: white;
@@ -102,14 +150,21 @@
 				border: 0;
 				border-radius: 2.5rem;
 			}
-			
+
+			#profile:hover {
+				border: 0;
+				border-radius: 2.5rem;
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+
 			#profile img {
 				border: 0;
 				border-radius: 2.5rem;
 				border-top-right-radius: 0;
 				border-bottom-right-radius: 0;
 			}
-			
+
 			#linkedin {
 				background-color: #0077B5;
 			}
@@ -127,9 +182,9 @@
 	<body>
 		<div id='profile' class="card mx-auto centered">
 		  <div class="row no-gutters">
-			<div class="col-md-5 img-hover-zoom">
+			<div class="col-md-5 hover01 hover08 hover14">
 				<a target="_blank" href="resume.html">
-					<img src="https://avatars2.githubusercontent.com/u/9107889" class="card-img" alt="Profile Image">
+					<figure><img src="https://avatars2.githubusercontent.com/u/9107889" class="card-img" alt="Profile Image"></figure>
 				</a>
 			</div>
 			<div class="col-md-7">
