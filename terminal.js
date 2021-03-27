@@ -9,8 +9,6 @@ var cmd_index = 0;
 var available_cmd = $('.command').map(function(index,dom){return dom.id}).toArray()
 
 $('#terminal__prompt--command').keydown(function(event) {
-  console.log(event.keyCode)
-
   // Number 13 is the 'Enter' key on the keyboard
   if (event.keyCode === 13) {
     // Cancel the default action, if needed
@@ -63,7 +61,10 @@ function run_command(){
         return;
           
       case 'exit':
-        close();
+        // It doensn't work with the message "Scripts may close only the windows that were opened by them".
+        // window.close();
+        window.close(); // 일반적인 현재 창 닫기
+        window.open('about:blank', '_self').self.close();  // IE에서 묻지 않고 창 닫기
         return;
 
       case 'history':
