@@ -1,312 +1,203 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
-	<head>
-		<title>Taeguk Kwon</title>
-		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
-		<meta name="viewport" content="width=device-width">
-		<link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Taeguk Shell</title>
+    <meta name="description" content="Taeguk's Shell">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon">
 		<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-		
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-		
-		<style>		
-			/*
-				@screen-xs-max: 767px;
-				@screen-sm-min: 768px;
-				@screen-sm-max: 991px;
-				@screen-md-min: 992px;
-				@screen-md-max: 1199px;
-				@screen-lg-min: 1200px;
-			*/
-			
-			@import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-			@import url(https://fonts.googleapis.com/earlyaccess/jejugothic.css);
+    <link rel="stylesheet" type="text/css" href="terminal.css"/>
+  </head>
+  <body>
+    <main id="container">
+      <div id="terminal">
+        <!-- Terminal Bar -->
+        <section id="terminal__bar">
+          <div id="bar__buttons">
+            <button class="bar__button" id="bar__button--exit">&#10005;</button>
+            <button class="bar__button">&#9472;</button>
+            <button class="bar__button">&#9723;</button>
+          </div>
+          <p id="bar__user">taeguk@seoul: ~</p>
+        </section>
+        <!-- Terminal Body -->
+        <section id="terminal__body">
+          <div id="terminal__prompt">
+            <pre id="terminal__prompt--logo-large">
+████████╗ █████╗ ███████╗ ██████╗ ██╗   ██╗██╗  ██╗    ███████╗██╗  ██╗███████╗██╗     ██╗     
+╚══██╔══╝██╔══██╗██╔════╝██╔════╝ ██║   ██║██║ ██╔╝    ██╔════╝██║  ██║██╔════╝██║     ██║     
+   ██║   ███████║█████╗  ██║  ███╗██║   ██║█████╔╝     ███████╗███████║█████╗  ██║     ██║     
+   ██║   ██╔══██║██╔══╝  ██║   ██║██║   ██║██╔═██╗     ╚════██║██╔══██║██╔══╝  ██║     ██║     
+   ██║   ██║  ██║███████╗╚██████╔╝╚██████╔╝██║  ██╗    ███████║██║  ██║███████╗███████╗███████╗
+   ╚═╝   ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+            </pre>
+            <pre id="terminal__prompt--logo-small">
+  ____ ____ ____ ____ ____ ____ _________ ____ ____ ____ ____ ____ 
+ ||T |||A |||E |||G |||U |||K |||       |||S |||H |||E |||L |||L ||
+ ||__|||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__|||__||
+ |/__\|/__\|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|/__\|/__\|
+            </pre>
+            <pre id="terminal__prompt--logo-xsmall">
+  ____ ____ ____ ____ ____ ____ 
+ ||T |||A |||E |||G |||U |||K ||
+ ||__|||__|||__|||__|||__|||__||
+ |/__\|/__\|/__\|/__\|/__\|/__\|
+          ____ ____ ____ ____ ____ 
+         ||S |||H |||E |||L |||L ||
+         ||__|||__|||__|||__|||__||
+         |/__\|/__\|/__\|/__\|/__\| 
+            </pre>             
+            <div id="executed_commands"></div>
+            <span class="terminal__prompt--user">taeguk@seoul:</span>
+            <span class="terminal__prompt--location">~</span>
+            <span class="terminal__prompt--bling">$</span>
+            <input type="text" autofocus="autofocus" id="terminal__prompt--command">
+            <br/><br/>
+          </div>
+        </section>
+      </div>
+    </main>
 
-			* {
-				/* font-family: 'Nanum Gothic', serif; */
-				font-family: 'Jeju Gothic', serif;
-			}
+	  <!-- Prompt -->
+    <div id="prompt" class="html_template">
+      <span class="terminal__prompt--user">taeguk@seoul: </span>
+      <span class="terminal__prompt--location">~ </span>
+      <span class="terminal__prompt--bling">$ </span>
+    </div>
 
-			html, body {
-				height:100%;
-			}
-			
-			a , a:hover {
-				text-decoration: none;
-			}
-			
-			.myrow {
-				margin: 0;
-				padding: 0;
-			}
-			
-			.elem-box {
-				height: 50%;
-				margin: 0;
-				padding: 0;
-				text-align: center;
-				color: white;
-				font-size: 50px;
-			}
-			
-			.elem-box a {
-				color: white;
-			}
-			
-			.elem-box:hover {
-				opacity: 0.6;
-			}
-			
-			.mytext-wrap {
-				display: table;
-				width: 100%;
-				height: 100%;
-			}
-			
-			.mytext {
-				display: table-cell;
-				vertical-align: middle;
-			}
-			
-			.centered {
-				position: fixed;
-				top: 50%;
-				left: 50%;
-				/* bring your own prefixes */
-				transform: translate(-50%, -50%);
-			}
-			
-			figure {
-				overflow: hidden;
-			}
+	  <!-- Error -->
+    <div id="error" class="html_template">
+      {0}: command not found. Enter 'help' to get list of all available commands.
+    </div>
 
-			/* Zoom In #1 */
-			#profile .hover01 figure img {
-				-webkit-transform: scale(1);
-				transform: scale(1);
-				-webkit-transition: .3s ease-in-out;
-				transition: .3s ease-in-out;
-			}
-			#profile:hover .hover01 figure img {
-				-webkit-transform: scale(1.58);
-				transform: scale(1.58);
-			}
+    <!-- Whoami -->
+    <div id="whoami" class="html_template command">
+      Nice to meet you :) <br/>
+      I'm software gardener in South Korea. <br/>
+      <br/>
+      I believe a business value is much important than perfection as a engineer. <br/>
+      I'm struggling to achieve high level technologies to be not bottleneck but booster for business. <br/>
+      And I try to keep the codebase at proper point between utopia and monster. I feel it's like gardening. <br/>
+      It's not necessary to make it perfect clean always, but shouldn't leave it to be messed for long time. <br/>
+      <br/>
+      I hope functional programming and strong type system will dominate software industry. <br/>
+      I hope many server developers will know about and introduce Event Sourcing and the concept of DDD Aggregate to their projects. <br/>
+      Most of all, I hope my family, friends, co-workers, and me will be healthy and wealthy :) <br/>
+      <br/>
+      Thanks! <br/>
+    </div>
 
-			/* Gray Scale */
-			#profile .hover08 figure img {
-				-webkit-filter: grayscale(100%);
-				filter: grayscale(100%);
-				-webkit-transition: .3s ease-in-out;
-				transition: .3s ease-in-out;
-			}
-			#profile:hover .hover08 figure img {
-				-webkit-filter: grayscale(0);
-				filter: grayscale(0);
-			}
+    <!-- Careers -->
+    <div id="careers" class="html_template command">
 
-			/* Flashing */
-			#profile:hover .hover13 figure {
-				opacity: 1;
-				-webkit-animation: flash 0.8s;
-				animation: flash 0.8s;
-			}
-			@-webkit-keyframes flash {
-				0% {
-					opacity: 0.1;
-				}
-				100% {
-					opacity: 1;
-				}
-			}
-			@keyframes flash {
-				0% {
-					opacity: 0.1;
-				}
-				100% {
-					opacity: 1;
-				}
-			}
+      <h3>Sogang University<br/><sub>2014.03 - NOW</sub></h3>
+      - Bachelor's degree, Computer Engineering <br/>
 
-			/* Shine */
-			#profile .hover14 figure {
-				position: relative;
-			}
-			#profile .hover14 figure::before {
-				position: absolute;
-				top: 0;
-				left: -75%;
-				z-index: 2;
-				display: block;
-				content: '';
-				width: 50%;
-				height: 100%;
-				background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
-				background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
-				-webkit-transform: skewX(-25deg);
-				transform: skewX(-25deg);
-			}
-			#profile:hover .hover14 figure::before {
-				-webkit-animation: shine .75s;
-				animation: shine .75s;
-				animation-delay: .35s;
-			}
-			@-webkit-keyframes shine {
-				100% {
-					left: 125%;
-				}
-			}
-			@keyframes shine {
-				100% {
-					left: 125%;
-				}
-			}
-			
-			#profile {
-				transition: border-radius .3s ease;
-				background-color: white;
-				background-size: contain;
-				z-index: 1000;
-				border: 0;
-				border-radius: 3rem;
-				border-top-left-radius: 3.1rem;
-				border-bottom-left-radius: 3.1rem;
-			}
+      <br/><hr/>
+      <h3>Samsung Software Membership<br/><sub>2015.07 - NOW</sub></h3>
+      - Study and develop some projects supported by Samsung Electronics. <br/>
 
-			#profile:hover {
-				border-radius: 0;
-				border-top-right-radius: 0;
-				border-bottom-right-radius: 0;
-			}
+      <br/><hr/>
+      <h3>SuaLab<br/><sub>2017.01 - 2017.02</sub></h3>
+      - Develop an alpha version of industrial image analysis software (SuaKIT) based on deep learning. <br/>
+      - C++14, C#, Windows <br/>
 
-			#profile img {
-				border: 0;
-				border-radius: 3rem;
-				border-top-right-radius: 0;
-				border-bottom-right-radius: 0;
-			}
+      <br/><hr/>
+      <h3>Google Summer Of Code<br/><sub>2017.05 - 2017.08</sub></h3>
+      - Worked as paid open source developer supported by google. <br/>
+      - Contributed to <a href='https://github.com/STEllAR-GROUP/hpx' target='_blank'>HPX (C++ Standard Library for Concurrency and Parallelism)</a><br/>
+      - Implement parallel algorithms specified in C++17 or above standard. <br/>
 
-			#linkedin {
-				background-color: #0077B5;
-			}
-			#github {
-				background-color: #24292E;
-			}
-			#blog {
-				background-color: #FF9224;
-			}
-			#facebook {
-				background-color: #4267B2;
-			}
-		</style>
-	</head>
-	<body>
-		<div id='profile' class="card mx-auto centered">
-		  <div class="row no-gutters">
-			<div class="col-md-5 hover01 hover08 hover13 hover14">
-				<a target="_blank" href="https://ask.fm/xornrbboy">
-					<figure><img src="assets/images/1.jpg" class="card-img" alt="Profile Image"/></figure>
-				</a>
-			</div>
-			<div class="col-md-7">
-			  <div class="card-body">
-				<h1 class="card-title">Taeguk Kwon</h1>
-				<p class="card-text">안녕하세요 :)</br> 산업기능요원 현역 복무중입니다^^</br> <span id='d-day'></span></p>
-				<p class="card-text"><small class="text-muted"><a href="mailto:xornrbboy@gmail.com">xornrbboy@gmail.com</a></small></p>
-			  </div>
-			</div>
-		  </div>
-		</div>
-		<div style="width:100%; height:100%">
-			<div class='row myrow'>
-				<div id="linkedin" class="col-12 col-sm-12 col-md-6 elem-box">
-					<a href='https://www.linkedin.com/in/taeguk'>
-						<span class="mytext-wrap"><span class="mytext">LinkedIn</span></span>
-					</a>
-				</div>
-				<div id="github" class="col-12 col-sm-12 col-md-6 elem-box">
-					<a href='https://github.com/taeguk'>
-						<span class="mytext-wrap"><span class="mytext">Github</span></span>
-					</a>
-				</div>
-				<div id="blog" class="col-12 col-sm-12 col-md-6 elem-box">
-					<a href='https://taeguk2.blogspot.com'>
-						<span class="mytext-wrap"><span class="mytext">Blog</span></span>
-					</a>
-				</div>
-				<div id="facebook" class="col-12 col-sm-12 col-md-6 elem-box">
-					<a href='https://www.facebook.com/xornrbboy'>
-						<span class="mytext-wrap"><span class="mytext">Facebook</span></span>
-					</a>
-				</div>
-			</div>
-		</div>
-		<script type="text/javascript">
-			function set_elem_box_height() {
-				var window_width = $(window).width();
-				var window_height = $(window).height();
-				
-				var elem_height;
-				if (window_width < 768) elem_height = window_height / 4;
-				else 				 elem_height = window_height / 2; 
-				
-				$('.elem-box').height(elem_height);
-			}
-			function modify_profile() {
-				var window_width = $(window).width();
-				
-				var profile_width;
-				var root_font_size;
-				
-				if(window_width <= 767) {
-					// hide profile
-					$('#profile').hide();
-					return;
-				}
-				else if(768 <= window_width && window_width <= 991) {
-					profile_width = 460;
-					root_font_size = '14px';
-				}
-				else if(992 <= window_width && window_width <= 1199) {
-					profile_width = 530;
-					root_font_size = '16px';
-				}
-				else {
-					profile_width = 600;
-					root_font_size = '18px';
-				}
-				
-				$('html').css('font-size', root_font_size);
-				$('#profile').width(profile_width);
-				$('#profile').height(profile_width * 5 / 12);
-				$('#profile').show();
-			}
-			
-			$(document).ready(function() {
-				set_elem_box_height();
-				modify_profile();
-			});
-			$(window).resize(function() {
-				set_elem_box_height();
-				modify_profile();
-			});
+      <br/><hr/>
+      <h3>ESTsoft Corp.<br/><sub>2017.09 - 2019.05</sub></h3>
+      - Redesign, rewrite, and improve an anti-malware engine used by "ALYac". <br/>
+      - Develop "ALYac EDR", mainly an integration with "Threat Inside" service. <br/>
+      - Maintain and improve a common library used by various products within a company. <br/>
 
-			var d_day = new Date("Sep 19, 2020 17:00:00").getTime();
+      <br/><hr/>
+      <h3>Devsisters<br/><sub>2019.06 - Now</sub></h3>
+      <h4>My Works</h4>
+      - Lead the game server for <a href='https://www.cookierun-kingdom.com/' target='_blank'>CookieRun: Kingdom</a> from pre-release to post-release. <br/>
+      - Manage issues and milestones related to the server. <br/>
+      - Participate most architecture and technical decisions. <br/>
+      - Implement many features such as guild, pvp, social, events, mailbox, etc... <br/>
+      <h4>Tech Stack</h4>
+      - Functional Programming, Event-Driven Architecture, Event Sourcing, CQRS, Actor Model, Domain-Driven Design <br/>
+      - Scala, ZIO, Cats, Doobie, Akka, sttp, ScalaPB, Chimney, Circe, Monocle, Magnolia <br/>
+      - CockroachDB, Redis, Kafka, Spark, gRPC, protobuf <br/>
+      - AWS, Kubernetes, Datadog APM <br/>
+    </div>
 
-			// 1초마다 d-day 가 갱신되도록 함.
-			var x = setInterval(function() {
-				var now = new Date().getTime();
-				var distance = d_day - now;
+    <!-- Hobby -->
+    <div id="hobby" class="html_template command">
+      404 NotFound
+    </div>
 
-				var d = Math.floor(distance / (1000 * 60 * 60 * 24));
-				var h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-				var m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-				var s = Math.floor((distance % (1000 * 60)) / 1000);
+    <!-- Guk On Glass -->
+    <div id="gukonglass" class="html_template command">
+      <figure style="padding:0; margin: 10px"><img src="assets/images/1.jpg" alt="Guk On Glass"/></figure>
+    </div>
 
-				$("#d-day").text(d + "일 " + h + "시간 " + m + "분 " + s + "초 남았습니다.");
-			});
-		</script>
-	</body>
+    <!-- Contact -->
+    <div id="contact" class="html_template command contact">
+      - Email &nbsp;&nbsp;&nbsp;:
+        <a href="mailto:xornrbboy@gmail.com">xornrbboy@gmail.com</a><br/>
+      - Linkedin : 
+        <a href='https://www.linkedin.com/in/taeguk/' target='_blank'>https://www.linkedin.com/in/taeguk/</a><br/>
+      - Github &nbsp;&nbsp;: 
+        <a href='https://github.com/taeguk' target='_blank'>https://github.com/taeguk</a><br/>
+      - Blog &nbsp;&nbsp;&nbsp;&nbsp;: 
+        <a href='https://taeguk2.blogspot.com' target='_blank'>https://taeguk2.blogspot.com</a><br/>
+      - Facebook : 
+        <a href='https://www.facebook.com/xornrbboy' target='_blank'>https://www.facebook.com/xornrbboy</a><br/>
+    </div>
+
+    <!-- LinkedIn -->
+    <div id="linkedin" class="html_template command">
+      <a href='https://www.linkedin.com/in/taeguk/' target='_blank'>https://www.linkedin.com/in/taeguk/</a>
+    </div>
+  
+    <!-- Github -->
+    <div id="github" class="html_template command">
+      <a href='https://github.com/taeguk' target='_blank'>https://github.com/taeguk</a>
+    </div>
+  
+    <!-- Blog -->
+    <div id="blog" class="html_template command">
+      <a href='https://taeguk2.blogspot.com' target='_blank'>https://taeguk2.blogspot.com</a>
+    </div>
+  
+    <!-- Facebook -->
+    <div id="facebook" class="html_template command">
+      <a href='https://www.facebook.com/xornrbboy' target='_blank'>https://www.facebook.com/xornrbboy</a>
+    </div>
+  
+	  <!-- Help -->
+    <div id="help" class="html_template command">
+      Avaliable Commands <br/>
+      ------------------ <br/>
+      - whoami, careers, hobby, gukonglass <br/>
+      - contact, linkedin, github, blog, facebook <br/>
+      - help, copyright, history, clear, exit <br/>
+      - You can auto complete using tab button. <br/>
+      - You can move your command histories using arrow up and down. <br/>
+    </div>
+
+    <!-- Copyright -->
+    <div id="copyright" class="html_template command">
+      I refer and utilize codes below: <br/>
+      - CSS for ubuntu-style terminal : https://github.com/fobabs/ubuntu-terminal <br/>
+      - JS for terminal behavior : https://github.com/kraten/terminal-resume <br/>
+    </div>
+
+    <!-- History, Clear, Exit -->
+    <div id="history" class="html_template command"></div>
+    <div id="clear" class="html_template command"></div>
+    <div id="exit" class="html_template command"></div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script type='text/javascript' src="terminal.js"></script>    
+  </body>
 </html>

@@ -1,0 +1,154 @@
+/*
+  Originally written by Kartike Bansal. (https://github.com/kraten/terminal-resume)
+  I copied that and modified for my purposes.
+*/
+
+// For commmand history
+var cmd_list = [];
+var cmd_index = 0;
+var available_cmd = $('.command').map(function(index,dom){return dom.id}).toArray()
+
+$('#terminal__prompt--command').keydown(function(event) {
+  console.log(event.keyCode)
+
+  // Number 13 is the 'Enter' key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    run_command();
+  }
+  // Number 38 is for 'Up Arrow' key on the keyboard
+  else if (event.keyCode === 38) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    cycle_command('up');
+  }
+  // Number 40 is for 'Down Arrow' key on the keyboard
+  else if (event.keyCode === 40) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    cycle_command('down');
+  }
+  // Number 9 is for 'Tab' key on the keyboard
+  else if (event.keyCode === 9) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    tab_completion();
+  }
+});
+
+$('#terminal__body').click(function(){
+  $('#terminal__prompt--command').focus();
+});
+
+function run_command(){
+  var cmd = $('#terminal__prompt--command');
+  var raw_input = cmd.val()
+  var input = raw_input.trim();
+  var output;
+  
+  if (input != ''){
+    // Get command from input field 
+    var element = $('#' + input);
+    
+    // Error command, if command not found
+    if (element.length === 0)
+      element = $('#error').clone().text(function(index,text){
+        return text.replace('{0}', input);
+      });
+
+    switch (input) {
+      case 'clear':
+        clear_console();
+        return;
+          
+      case 'exit':
+        close();
+        return;
+
+      case 'history':
+        element = $('<div>')
+        for (i = 0; i < cmd_list.length; i++) {
+          element.append($('<div>').text((i+1) + ': ' + cmd_list[i]))
+        }
+        break;
+
+      case 'linkedin':
+      case 'github':
+      case 'blog':
+      case 'facebook':
+        window.open(element.find('a').attr('href'), '_blank');
+        break;
+    }
+
+    element.find('a').click()
+
+    // Create a clone to show as command output
+    output = element.clone().removeAttr('id').removeClass('html_template')
+  }
+
+  var prompt = $('#prompt').clone().append($('<span>').html(raw_input.replaceAll(' ', '&nbsp;'))).removeAttr('id').removeClass('html_template')
+
+  // Get command output in HTML format
+  var cmd_output = $('<div>').append(prompt).append(output).append('<br/>');
+
+  // Append the command output to the executed commands div container
+  $('#executed_commands').append(cmd_output);
+
+  // Clear the command input field
+  cmd.val('');
+
+  // Append input command to command list
+  if (input != ''){
+    cmd_list.push(input);
+    cmd_index = cmd_list.length;
+  }
+
+  // Scroll to the end
+  var scrollingElement = (document.scrollingElement || document.body);
+  scrollingElement.scrollTop = scrollingElement.scrollHeight;
+
+  $('#terminal__body').scrollTop($('#terminal__body').prop('scrollHeight'));
+}
+
+// Cycle through commands list using arrow keys
+function cycle_command(direction){
+  if (direction === 'up'){
+    if (cmd_index > 0)
+      cmd_index -= 1;
+  }
+  else if (direction === 'down'){
+    if (cmd_index < cmd_list.length)
+      cmd_index += 1;
+  }
+
+  // console.log(cmd_list);
+  // console.log(cmd_list.length);
+  // console.log(cmd_index);
+
+  // Update input
+  var cmd = $('#terminal__prompt--command');
+  if (cmd_index < cmd_list.length)
+    cmd.val(cmd_list[cmd_index]);
+  else
+    cmd.val('')
+}
+
+function tab_completion(){
+  // Get input
+  var cmd = $('#terminal__prompt--command');   
+  var input = cmd.val();
+  
+  for (index = 0; index < available_cmd.length; index++) { 
+    if (available_cmd[index].startsWith(input)){
+      cmd.val(available_cmd[index]);
+      //console.log(available_cmd[index]);
+      break;
+    }
+  }
+}
+
+function clear_console(){
+  $('#executed_commands').empty();
+  $('#terminal__prompt--command').val('');
+}
