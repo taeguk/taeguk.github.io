@@ -88,6 +88,10 @@ body {
   overflow-y: auto;
 }
 
+#terminal__prompt {
+  width: 100%;
+}
+
 #terminal__prompt--logo-large {
   display: block;
   overflow: hidden;
@@ -117,6 +121,7 @@ body {
   color: #dddddd;
 }
 #terminal__prompt--command {
+  width: calc(100% - 145px);
   border: 0;
   padding: 0;
   background: inherit;
