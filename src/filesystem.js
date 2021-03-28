@@ -169,14 +169,25 @@ exports.cat = async function (filePath) {
   filePath = getAbsolutePath(filePath)
   const type = await getPathType(filePath)
 
+  const streamToString = (stream) =>
+    new Promise((resolve, reject) => {
+      console.log(stream)
+      const chunks = []
+      stream.on("data", (chunk) => chunks.push(chunk))
+      stream.on("error", reject)
+      stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
+    })
+
   switch (type) {
     case 'dir':
       throw new Error('is a directory: ' + filePath)
 
     case 'file':
       const key = getFileKeyForS3(filePath)
-      const data = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
-      return $('<pre>').text(data.Body.toString('utf-8'))
+      const {Body} = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
+      const data = await Body.getReader().read()
+      const text = Buffer.from(data.value).toString('utf-8')
+      return $('<pre>').text(text)
 
     case 'not_exists':
       throw new Error('no such file or directory: ' + filePath)
@@ -198,6 +209,7 @@ exports.redirectToFile = async function (filePath, content) {
     case 'not_exists':
       const key = getFileKeyForS3(filePath)
       await s3.send(new PutObjectCommand({Bucket: 'taeguk-github-io-public', Key: key, Body: content}))
+      break
 
     default:
       throw new Error('unknown error')
