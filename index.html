@@ -20,7 +20,7 @@
             <button class="bar__button">&#9472;</button>
             <button class="bar__button">&#9723;</button>
           </div>
-          <p id="bar__user">taeguk@seoul: ~</p>
+          <p id="bar__user">taeguk@seoul: <span class='current_location'>/</span></p>
         </section>
         <!-- Terminal Body -->
         <section id="terminal__body">
@@ -50,22 +50,17 @@
          |/__\|/__\|/__\|/__\|/__\| 
             </pre>             
             <div id="executed_commands"></div>
-            <span class="terminal__prompt--user">taeguk@seoul:</span>
-            <span class="terminal__prompt--location">~</span>
-            <span class="terminal__prompt--bling">$</span>
+            <div id="prompt" style="display: inline-block">
+              <span class="terminal__prompt--user">taeguk@seoul:</span>
+              <span class="terminal__prompt--location current_location">/</span>
+              <span class="terminal__prompt--bling">$</span>
+            </div>
             <input type="text" autofocus="autofocus" id="terminal__prompt--command">
             <br/><br/>
           </div>
         </section>
       </div>
     </main>
-
-	  <!-- Prompt -->
-    <div id="prompt" class="html_template">
-      <span class="terminal__prompt--user">taeguk@seoul: </span>
-      <span class="terminal__prompt--location">~ </span>
-      <span class="terminal__prompt--bling">$ </span>
-    </div>
 
 	  <!-- Error -->
     <div id="error" class="html_template">
@@ -177,10 +172,17 @@
 	  <!-- Help -->
     <div id="help" class="html_template command">
       Avaliable Commands <br/>
-      ------------------ <br/>
+      --------------------------- <br/>
       - whoami, careers, hobby, gukonglass <br/>
       - contact, linkedin, github, blog, facebook <br/>
       - help, copyright, history, clear, exit <br/>
+      <br/>
+      Remote File System Commands <br/>
+      --------------------------- <br/>
+      - pwd, cd, ls <br/>
+      <br/>
+      Tips <br/>
+      --------------------------- <br/>
       - You can auto complete using tab button. <br/>
       - You can move your command histories using arrow up and down. <br/>
     </div>
@@ -197,7 +199,12 @@
     <div id="clear" class="html_template command"></div>
     <div id="exit" class="html_template command"></div>
 
+    <!-- pwd, cd, ls -->
+    <div id="pwd" class="html_template command"></div>
+    <div id="cd" class="html_template command"></div>
+    <div id="ls" class="html_template command"></div>
+  
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script type='text/javascript' src="terminal.js"></script>    
+    <script type='text/javascript' src="browser-app.js"></script>
   </body>
 </html>
