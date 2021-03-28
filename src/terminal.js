@@ -33,7 +33,7 @@ $('#terminal__prompt--command').keydown(async function(event){
   else if (event.keyCode === 9) {
     // Cancel the default action, if needed
     event.preventDefault()
-    tabCompletion()
+    await autoComplete()
   }
 })
 
@@ -87,7 +87,7 @@ async function runCommand(){
     try {
       switch (cmd) {
         case 'clear':
-          clear_console()
+          clearConsole()
           return
             
         case 'exit':
@@ -116,10 +116,10 @@ async function runCommand(){
           break;
 
         case 'cd':
-          if (params.length === 0)
-            cmdResult = await filesystem.cd('/')
-          else
+          if (params.length > 0)
             cmdResult = await filesystem.cd(params[0])
+          else
+            cmdResult = await filesystem.cd('/')
           break
 
         case 'ls':
@@ -196,20 +196,69 @@ function cycleCommand(direction){
     cmdLine.val('')
 }
 
-function tabCompletion(){
-  // Get input
-  let cmdLine = $('#terminal__prompt--command')   
-  let input = cmdLine.val()
-  
-  for (i = 0; i < availableCmds.length; i++) { 
-    if (availableCmds[i].startsWith(input)){
-      cmdLine.val(availableCmds[i])
-      break
-    }
+async function autoComplete(){
+  const [rawInput, cmd, params, redirectTargetFiles] = parseInput()
+  const trimmedRawInput = rawInput.trim()
+  const lastCharOfTrimned = trimmedRawInput.substr(-1)
+  const lastChar = rawInput.substr(-1)
+
+  let target, keyword
+
+  // It means typing a command and parameters is finished. So the place is for redirection target file.
+  if (redirectTargetFiles.length > 0 || lastCharOfTrimned === '>') {
+    target = 'file'
+    keyword = redirectTargetFiles.length > 0 && lastChar !== ' ' ? redirectTargetFiles[redirectTargetFiles.length - 1] : ''
   }
+  // It means typing a command is finished. So the place is for parameters.
+  else if (params.length > 0 || lastChar !== lastCharOfTrimned) {
+    if (cmd === 'cd')
+      target = 'dir'
+    else if (cmd === 'cat')
+      target = 'file'
+    else
+      target = 'file'
+
+    keyword = params.length > 0 && lastChar !== ' ' ? params[params.length - 1] : ''
+  }
+  // It means still typing a command.
+  else {
+    target = 'cmd'
+    keyword = cmd
+  }
+
+  let autoCompleted = keyword
+  switch (target) {
+    case 'file':
+      autoCompleted = await filesystem.autoCompleteFile(keyword)
+      break
+
+    case 'dir':
+      autoCompleted = await filesystem.autoCompleteDir(keyword)
+      break
+
+    case 'cmd':
+      autoCompleted = autoCompleteCmd(keyword)
+      break
+  }
+
+  const indexToBeInserted = rawInput.length - keyword.length
+  var modifiedCmdLine = rawInput.slice(0, indexToBeInserted) + autoCompleted
+  if (target !== 'dir' && autoCompleted !== keyword)
+    modifiedCmdLine += ' '
+  $('#terminal__prompt--command').val(modifiedCmdLine)
+
+  console.log('auto complete of keyword: ' + keyword + ' -> ' + autoCompleted)
+  console.log('auto complete of cmdline: ' + rawInput + ' -> ' + modifiedCmdLine)
 }
 
-function clear_console(){
+function autoCompleteCmd(keyword){
+  for (i = 0; i < availableCmds.length; i++)
+    if (availableCmds[i].startsWith(keyword))
+      return availableCmds[i]
+  return keyword
+}
+
+function clearConsole(){
   $('#executed_commands').empty()
   $('#terminal__prompt--command').val('')
 }

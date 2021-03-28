@@ -30,15 +30,13 @@ function getAbsolutePath (filePath) {
 
 exports.cd = async function (dir) {
   let targetDir = getAbsolutePath(dir)
-
-  // Remove trailing slash.
-  if (targetDir !== '/')
-    targetDir = targetDir.replace(/\/$/, "")
-
   const type = targetDir === '/' ? 'dir' : await getPathType(targetDir)
+
   switch (type) {
     case 'dir':
-      $('.current_location').text(targetDir)
+      // remove trailing slash except foremost slash
+      let location = targetDir === '/' ? '/' : targetDir.replace(/\/$/, "")
+      $('.current_location').text(location)
       return $('')
 
     case 'file':
@@ -52,13 +50,41 @@ exports.cd = async function (dir) {
   }
 }
 
+exports.autoCompleteDir = async function (keyword) {
+  const curDir = $('.current_location').first().text()
+
+  // First, try to find matched directory in childs.
+  var prefix = getDirKeyForS3(curDir + '/' + keyword)
+  var data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: prefix}))
+
+  // If not found, try to matched directory in siblings.
+  if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0) {
+    // Remove trailing slash.
+    prefix = prefix.replace(/\/$/, "")
+    data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: prefix}))
+  }
+
+  if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0)
+    return keyword
+  else
+    return path.relative(curDir, data.CommonPrefixes[0].Prefix) + '/'
+}
+
+exports.autoCompleteFile = async function (keyword) {
+  const curDir = $('.current_location').first().text()
+  const prefix = getFileKeyForS3(curDir + '/' + keyword)
+  const data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Prefix: prefix, MaxKeys: 1}))
+
+  if (data.Contents !== undefined && data.Contents.length > 0)
+    return path.relative(curDir, data.Contents[0].Key)
+  else
+    return keyword
+}
+
 async function getPathType (fileOrDir) {
   const dirKey = getDirKeyForS3(fileOrDir)
   const dirData = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Prefix: dirKey, MaxKeys: 1}))
   const isDirExists = dirData.Contents !== undefined && dirData.Contents.length > 0
-
-  console.log(dirKey)
-  console.log(dirData)
 
   if (isDirExists)
     return 'dir'
@@ -84,8 +110,8 @@ async function getPathType (fileOrDir) {
 
 function getFileKeyForS3 (filePath) {
   // - make it sure to be normalized.
-  // - remove first slash.
-  // - remove last slash.
+  // - remove foremost slash.
+  // - remove trailing slash.
   filePath = path.normalize(filePath)
   filePath = filePath[0] === '/' ? filePath.substring(1) : filePath
   filePath = filePath.replace(/\/$/, "")
@@ -97,9 +123,10 @@ function getDirKeyForS3 (dir) {
   // make it sure to be normalized like "/aaaaa/bb/ccc".
   dir = path.normalize(dir)
 
-  // "/aaaaa/bb/ccc" -> "aaaaa/bb/ccc/"
   // "/" -> ""
-  return dir === '/' ? '' : dir.substring(1) + '/'
+  // "/aaaaa/bb/ccc" -> "aaaaa/bb/ccc/"
+  // "/aaaaa/bb/ccc/" -> "aaaaa/bb/ccc/"
+  return dir === '/' ? '' : dir.substring(1).replace(/\/$/, "") + '/'
 }
 
 async function listObjectsFromS3 (dir) {
@@ -118,8 +145,6 @@ exports.ls = async function () {
   const curDir = $('.current_location').first().text()
   const data = await listObjectsFromS3(curDir)
   let result = $('<pre>')
-
-  console.log(data)
 
   data.CommonPrefixes.forEach(commonPrefix => {
     const dirPath = commonPrefix.Prefix
