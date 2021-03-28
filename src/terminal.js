@@ -41,21 +41,36 @@ $('#terminal__body').click(function(){
   $('#terminal__prompt--command').focus()
 })
 
-async function runCommand(){
-  var cmd = $('#terminal__prompt--command')
-  var input = cmd.val()
-  const [inputCmd, ...inputParams] = input.split(' ')
-  var output
+function parseInput() {
+  const cmdLine = $('#terminal__prompt--command')
+  const rawInput = cmdLine.val()
+  const [cmdAndParams, ...redirectParts] = rawInput.trim().split('>')
+  const [cmd, ...params] = cmdAndParams.trim().split(' ')
 
-  var prompt = $('#prompt').clone().append($('<span style="white-space:pre">').text(input)).removeAttr('id')
+  // Same hehavior of bash shell
+  // ["1 2", "3 4"] => ["1", "3"]
+  const targetFiles = redirectParts.map((v,i,a) => { return v.trim().split(' ')[0] })
+
+  return [rawInput, cmd, params, targetFiles]
+}
+
+async function runCommand(){
+  const [rawInput, cmd, params, redirectTargetFiles] = parseInput()
+
+  console.log('raw input : ' + rawInput)
+  console.log('cmd : ' + cmd)
+  console.log('params : ' + params)
+  console.log('redirectTargetFiles : ' + redirectTargetFiles)
+
+  var prompt = $('#prompt').clone().append($('<span style="white-space:pre">').text(rawInput)).removeAttr('id')
   prompt.find('*').removeClass('current_location')
   
-  if (inputCmd != ''){
+  if (cmd != ''){
     // Get command from input field 
     var cmdResult
 
     try {
-      cmdResult = $('#' + inputCmd)
+      cmdResult = $('#' + cmd)
     } catch(err) {
       cmdResult = []
     }
@@ -63,11 +78,12 @@ async function runCommand(){
     // Error command, if command not found
     if (cmdResult.length === 0)
       cmdResult = $('#error').clone().text(function(index,text){
-        return text.replace('{0}', inputCmd)
+        return text.replace('{0}', cmd)
       })
 
+    var output
     try {
-      switch (inputCmd) {
+      switch (cmd) {
         case 'clear':
           clear_console()
           return
@@ -80,9 +96,9 @@ async function runCommand(){
           return
 
         case 'history':
-          cmdResult = $('<div>')
+          cmdResult = $('<pre>')
           for (i = 0; i < cmdHistories.length; i++) {
-            cmdResult.append($('<div style="white-space:pre">').text((i+1) + ': ' + cmdHistories[i].trim()))
+            cmdResult.append($(document.createTextNode((i+1) + ': ' + cmdHistories[i] + '\n')))
           }
           break
 
@@ -94,28 +110,41 @@ async function runCommand(){
           break
 
         case 'pwd':
-          cmdResult = $('<div>').text($('.current_location').first().text())
+          cmdResult = $('<pre>').text($('.current_location').first().text())
           break;
 
         case 'cd':
-          if (inputParams.length == 0)
+          if (params.length == 0)
             cmdResult = await filesystem.cd('/')
           else
-            cmdResult = await filesystem.cd(inputParams[0])
+            cmdResult = await filesystem.cd(params[0])
           break
 
         case 'ls':
-          if (inputParams.length === 0)
+          if (params.length === 0)
             cmdResult = await filesystem.ls()
           break
 
         case 'cat':
-          if (inputParams.length > 0)
-            cmdResult = await filesystem.cat(inputParams[0])
+          if (params.length > 0)
+            cmdResult = await filesystem.cat(params[0])
           break
       }
     } catch (err) {
-      cmdResult = $('<div>').text(err.message)
+      cmdResult = $('<pre>').text(err.message)
+    }
+
+    // If necessary, redirect results to files.
+    if (redirectTargetFiles.length > 0) {
+      try {
+        const content = cmdResult.text()
+        await redirectTargetFiles.forEach(targetFile =>
+          filesystem.redirectToFile(targetFile, content)
+        )
+        cmdResult = $('')
+      } catch (err) {
+        cmdResult = $('<pre>').text(err.message)
+      }
     }
 
     // Create a clone to show as command output
@@ -123,17 +152,17 @@ async function runCommand(){
   }
 
   // Get command output in HTML format
-  var cmdOutput = $('<div>').append(prompt).append(output).append('<br/>')
+  var executedCommand = $('<div>').append(prompt).append(output).append('<br/>')
 
   // Append the command output to the executed commands div container
-  $('#executed_commands').append(cmdOutput)
+  $('#executed_commands').append(executedCommand)
 
   // Clear the command input field
-  cmd.val('')
+  $('#terminal__prompt--command').val('')
 
   // Append input command to command list
-  if (inputCmd != ''){
-    cmdHistories.push(input)
+  if (cmd != ''){
+    cmdHistories.push(rawInput)
     cmdCursor = cmdHistories.length
   }
 
@@ -156,21 +185,21 @@ function cycleCommand(direction){
   }
 
   // Update input
-  var cmd = $('#terminal__prompt--command')
+  var cmdLine = $('#terminal__prompt--command')
   if (cmdCursor < cmdHistories.length)
-    cmd.val(cmdHistories[cmdCursor])
+    cmdLine.val(cmdHistories[cmdCursor])
   else
-    cmd.val('')
+    cmdLine.val('')
 }
 
 function tabCompletion(){
   // Get input
-  var cmd = $('#terminal__prompt--command')   
-  var input = cmd.val()
+  var cmdLine = $('#terminal__prompt--command')   
+  var input = cmdLine.val()
   
   for (i = 0; i < availableCmds.length; i++) { 
     if (availableCmds[i].startsWith(input)){
-      cmd.val(availableCmds[i])
+      cmdLine.val(availableCmds[i])
       break
     }
   }

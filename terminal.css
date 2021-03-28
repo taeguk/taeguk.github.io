@@ -103,6 +103,10 @@ body {
   overflow: hidden;
 }
 
+#executed_commands pre {
+  margin: 0;
+}
+
 .terminal__prompt--user {
   color: #7eda28;
 }

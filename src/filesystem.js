@@ -11,16 +11,21 @@ var s3 = new AWS.S3({
   params: {Bucket: 'taeguk-github-io-public'}
 })
 
-exports.cd = async function (dir) {
+function getAbsolutePath (filePath) {
   const curDir = $('.current_location').first().text()
   var targetDir
 
-  if (dir.startsWith('/'))
-    targetDir = dir
+  if (filePath.startsWith('/'))
+    targetDir = filePath
   else
-    targetDir = curDir + '/' + dir
+    targetDir = curDir + '/' + filePath
 
   targetDir = path.normalize(targetDir)
+  return targetDir
+}
+
+exports.cd = async function (dir) {
+  var targetDir = getAbsolutePath(dir)
 
   // Remove trailing slash.
   if (targetDir !== '/')
@@ -30,16 +35,16 @@ exports.cd = async function (dir) {
   switch (status) {
     case 'dir':
       $('.current_location').text(targetDir)
-      return $('<div>').text('')
+      return $('')
 
     case 'file':
-      return $('<div>').text('not a directory: ' + dir)
+      throw new Error('not a directory: ' + dir)
 
     case 'not_exists':
-      return $('<div>').text('no such file or directory: ' + dir)
+      throw new Error('no such file or directory: ' + dir)
 
     default:
-      return $('<div>').text('unknown error')
+      throw new Error('unknown error')
   }
 }
 
@@ -87,7 +92,7 @@ function getDirListingPrefixForS3 (dir) {
 }
 
 exports.ls = async function () {
-  var result = $('<div>')
+  var result = $('<pre>')
 
   const curDir = $('.current_location').first().text()
   const prefixForS3 = getDirListingPrefixForS3(curDir)
@@ -99,7 +104,7 @@ exports.ls = async function () {
       data.CommonPrefixes.map(function(commonPrefix) {
         const dirPath = commonPrefix.Prefix
         const dirName = path.basename(dirPath) + '/'
-        result.append($('<div>').text(dirName))
+        result.append($(document.createTextNode(dirName + '\n')))
       })
 
       data.Contents.map(function(content) {
@@ -108,7 +113,7 @@ exports.ls = async function () {
         const fileSize = content.Size
         const lastModified = content.LastModified
 
-        result.append($('<div>').text(fileName))
+        result.append($(document.createTextNode(fileName + '\n')))
       })
     }
   }).promise()
@@ -117,11 +122,12 @@ exports.ls = async function () {
 }
 
 exports.cat = async function (filePath) {
+  filePath = getAbsolutePath(filePath)
   const status = await getFileStatus(filePath)
 
   switch (status) {
     case 'dir':
-      return $('<div>').text('is a directory: ' + filePath)
+      throw new Error('is a directory: ' + filePath)
 
     case 'file':
       var result = $('<pre>')
@@ -137,9 +143,30 @@ exports.cat = async function (filePath) {
       return result
 
     case 'not_exists':
-      return $('<div>').text('no such file or directory: ' + filePath)
+      throw new Error('no such file or directory: ' + filePath)
 
     default:
-      return $('<div>').text('unknown error')
+      throw new Error('unknown error')
+  }
+}
+
+exports.redirectToFile = async function (filePath, content) {
+  filePath = getAbsolutePath(filePath)
+  const status = await getFileStatus(filePath)
+
+  switch (status) {
+    case 'dir':
+      throw new Error('is a directory: ' + filePath)
+
+    case 'file':
+    case 'not_exists':
+      const key = getKeyForS3(filePath)
+      await s3.upload({Key: key, Body: content}, (err, data) => {
+        if (err)
+          throw err
+      }).promise()
+
+    default:
+      throw new Error('unknown error')
   }
 }
