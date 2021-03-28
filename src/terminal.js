@@ -107,12 +107,15 @@ async function runCommand(){
         case 'ls':
           cmdResult = await filesystem.ls()
           break
+
+        case 'cat':
+          cmdResult = await filesystem.cat(inputParams[0])
+          break
       }
     } catch (err) {
       cmdResult = $('<div>').text(err.message)
     }
 
-    console.log(cmdResult)
     // Create a clone to show as command output
     output = cmdResult.clone().removeAttr('id').removeClass('html_template')
   }

@@ -26,13 +26,13 @@ exports.cd = async function (dir) {
   if (targetDir !== '/')
     targetDir = targetDir.replace(/\/$/, "")
 
-  var existence = await checkDirExistence(targetDir)
-  switch (existence) {
-    case 'exists':
+  var status = await getFileStatus(targetDir)
+  switch (status) {
+    case 'dir':
       $('.current_location').text(targetDir)
       return $('<div>').text('')
 
-    case 'is_file':
+    case 'file':
       return $('<div>').text('not a directory: ' + dir)
 
     case 'not_exists':
@@ -43,9 +43,9 @@ exports.cd = async function (dir) {
   }
 }
 
-async function checkDirExistence (dir) {
-  var result
-  const prefixForS3 = dir.substring(1) // remove first slash.
+async function getFileStatus (filePath) {
+  var status
+  const prefixForS3 = getKeyForS3(filePath)
 
   await s3.listObjectsV2({Delimiter: '/', Prefix: prefixForS3, MaxKeys: 1}, (err, data) => {
     if (err)
@@ -55,21 +55,34 @@ async function checkDirExistence (dir) {
       const isFileExists = data.Contents.length > 0
 
       if (isDirExists)
-        result = 'exists'
+        status = 'dir'
       else if (isFileExists)
-        result = 'is_file'
+        status = 'file'
       else
-        result = 'not_exists'
+        status = 'not_exists'
     }
   }).promise()
 
-  return result
+  return status
 }
 
-function getDirPrefixForS3 (dir) {
+function getKeyForS3 (filePath) {
+  // - make it sure to be normalized.
+  // - remove first slash.
+  // - remove last slash.
+  filePath = path.normalize(filePath)
+  filePath = filePath[0] === '/' ? filePath.substring(1) : filePath
+  filePath = filePath.replace(/\/$/, "")
+
+  return filePath
+}
+
+function getDirListingPrefixForS3 (dir) {
+  // make it sure to be normalized like "/aaaaa/bb/ccc".
+  dir = path.normalize(dir)
+
   // "/aaaaa/bb/ccc" -> "aaaaa/bb/ccc/"
   // "/" -> ""
-  dir = dir.trim()
   return dir === '/' ? '' : dir.substring(1) + '/'
 }
 
@@ -77,33 +90,56 @@ exports.ls = async function () {
   var result = $('<div>')
 
   const curDir = $('.current_location').first().text()
-  const prefixForS3 = getDirPrefixForS3(curDir)
+  const prefixForS3 = getDirListingPrefixForS3(curDir)
 
-  try {
-    await s3.listObjectsV2({Delimiter: '/', Prefix: prefixForS3}, (err, data) => {
-      if (err) {
-        result.append($('<div>').text(err.message))
-      }
-      else {
-        data.CommonPrefixes.map(function(commonPrefix) {
-          const dirPath = commonPrefix.Prefix
-          const dirName = path.basename(dirPath) + '/'
-          result.append($('<div>').text(dirName))
-        })
+  await s3.listObjectsV2({Delimiter: '/', Prefix: prefixForS3}, (err, data) => {
+    if (err)
+      throw err
+    else {
+      data.CommonPrefixes.map(function(commonPrefix) {
+        const dirPath = commonPrefix.Prefix
+        const dirName = path.basename(dirPath) + '/'
+        result.append($('<div>').text(dirName))
+      })
 
-        data.Contents.map(function(content) {
-          const filePath = content.Key
-          const fileName = path.basename(filePath)
-          const fileSize = content.Size
-          const lastModified = content.LastModified
+      data.Contents.map(function(content) {
+        const filePath = content.Key
+        const fileName = path.basename(filePath)
+        const fileSize = content.Size
+        const lastModified = content.LastModified
 
-          result.append($('<div>').text(fileName))
-        })
-      }
-    }).promise()
-  } catch (err) {
-    result.append($('<div>').text(err.message))
-  }
+        result.append($('<div>').text(fileName))
+      })
+    }
+  }).promise()
 
   return result
+}
+
+exports.cat = async function (filePath) {
+  const status = await getFileStatus(filePath)
+
+  switch (status) {
+    case 'dir':
+      return $('<div>').text('is a directory: ' + filePath)
+
+    case 'file':
+      var result = $('<pre>')
+      const key = getKeyForS3(filePath)
+
+      await s3.getObject({Key: key}, (err, data) => {
+        if (err)
+          throw err
+        else
+          result.text(data.Body.toString('utf-8'))
+      }).promise()
+
+      return result
+
+    case 'not_exists':
+      return $('<div>').text('no such file or directory: ' + filePath)
+
+    default:
+      return $('<div>').text('unknown error')
+  }
 }
