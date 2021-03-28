@@ -105,11 +105,13 @@ async function runCommand(){
           break
 
         case 'ls':
-          cmdResult = await filesystem.ls()
+          if (inputParams.length === 0)
+            cmdResult = await filesystem.ls()
           break
 
         case 'cat':
-          cmdResult = await filesystem.cat(inputParams[0])
+          if (inputParams.length > 0)
+            cmdResult = await filesystem.cat(inputParams[0])
           break
       }
     } catch (err) {
