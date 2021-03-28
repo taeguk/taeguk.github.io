@@ -6,16 +6,16 @@
 const filesystem = require('./filesystem.js')
 
 // For commmand history
-var cmdHistories = []
-var cmdCursor = 0
-var availableCmds = $('.command').map((index, dom) => { return dom.id }).toArray()
+let cmdHistories = []
+let cmdCursor = 0
+let availableCmds = $('.command').map((index, dom) => { return dom.id }).toArray()
 
-$('#terminal__prompt--command').keydown(event => {
+$('#terminal__prompt--command').keydown(async function(event){
   // Number 13 is the 'Enter' key on the keyboard
   if (event.keyCode === 13) {
     // Cancel the default action, if needed
     event.preventDefault()
-    runCommand()
+    await runCommand()
   }
   // Number 38 is for 'Up Arrow' key on the keyboard
   else if (event.keyCode === 38) {
@@ -57,17 +57,20 @@ function parseInput() {
 async function runCommand(){
   const [rawInput, cmd, params, redirectTargetFiles] = parseInput()
 
-  console.log('raw input : ' + rawInput)
-  console.log('cmd : ' + cmd)
-  console.log('params : ' + params)
-  console.log('redirectTargetFiles : ' + redirectTargetFiles)
+  console.log(
+    'raw input : ' + rawInput + '\n' +
+    'cmd : ' + cmd + '\n' +
+    'params : ' + params + '\n' +
+    'redirectTargetFiles : ' + redirectTargetFiles
+  )
 
-  var prompt = $('#prompt').clone().append($('<span style="white-space:pre">').text(rawInput)).removeAttr('id')
-  prompt.find('*').removeClass('current_location')
-  
-  if (cmd != ''){
+  let output
+  let prompt = $('#prompt').clone().append($('<span style="white-space:pre">').text(rawInput)).removeAttr('id')
+  prompt.find('*').removeClass('current_location')  
+
+  if (cmd !== ''){
     // Get command from input field 
-    var cmdResult
+    let cmdResult
 
     try {
       cmdResult = $('#' + cmd)
@@ -81,7 +84,6 @@ async function runCommand(){
         return text.replace('{0}', cmd)
       })
 
-    var output
     try {
       switch (cmd) {
         case 'clear':
@@ -114,7 +116,7 @@ async function runCommand(){
           break;
 
         case 'cd':
-          if (params.length == 0)
+          if (params.length === 0)
             cmdResult = await filesystem.cd('/')
           else
             cmdResult = await filesystem.cd(params[0])
@@ -131,6 +133,7 @@ async function runCommand(){
           break
       }
     } catch (err) {
+      console.log(err)
       cmdResult = $('<pre>').text(err.message)
     }
 
@@ -143,6 +146,7 @@ async function runCommand(){
         )
         cmdResult = $('')
       } catch (err) {
+        console.log(err)
         cmdResult = $('<pre>').text(err.message)
       }
     }
@@ -152,7 +156,7 @@ async function runCommand(){
   }
 
   // Get command output in HTML format
-  var executedCommand = $('<div>').append(prompt).append(output).append('<br/>')
+  let executedCommand = $('<div>').append(prompt).append(output).append('<br/>')
 
   // Append the command output to the executed commands div container
   $('#executed_commands').append(executedCommand)
@@ -161,13 +165,13 @@ async function runCommand(){
   $('#terminal__prompt--command').val('')
 
   // Append input command to command list
-  if (cmd != ''){
+  if (cmd !== ''){
     cmdHistories.push(rawInput)
     cmdCursor = cmdHistories.length
   }
 
   // Scroll to the end
-  var scrollingElement = (document.scrollingElement || document.body)
+  let scrollingElement = (document.scrollingElement || document.body)
   scrollingElement.scrollTop = scrollingElement.scrollHeight
 
   $('#terminal__body').scrollTop($('#terminal__body').prop('scrollHeight'))
@@ -185,7 +189,7 @@ function cycleCommand(direction){
   }
 
   // Update input
-  var cmdLine = $('#terminal__prompt--command')
+  let cmdLine = $('#terminal__prompt--command')
   if (cmdCursor < cmdHistories.length)
     cmdLine.val(cmdHistories[cmdCursor])
   else
@@ -194,8 +198,8 @@ function cycleCommand(direction){
 
 function tabCompletion(){
   // Get input
-  var cmdLine = $('#terminal__prompt--command')   
-  var input = cmdLine.val()
+  let cmdLine = $('#terminal__prompt--command')   
+  let input = cmdLine.val()
   
   for (i = 0; i < availableCmds.length; i++) { 
     if (availableCmds[i].startsWith(input)){
