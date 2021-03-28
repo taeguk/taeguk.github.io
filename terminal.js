@@ -41,21 +41,27 @@ $('#terminal__body').click(function(){
 
 function run_command(){
   var cmd = $('#terminal__prompt--command');
-  var raw_input = cmd.val()
-  var input = raw_input.trim();
+  var input = cmd.val()
+  var input_cmd = input.trim().replace(/ .*/,''); // Get first word only
   var output;
   
-  if (input != ''){
+  if (input_cmd != ''){
     // Get command from input field 
-    var element = $('#' + input);
+    var cmd_result;
+
+    try {
+      cmd_result = $('#' + input_cmd);
+    } catch(error) {
+      cmd_result = [];
+    }
     
     // Error command, if command not found
-    if (element.length === 0)
-      element = $('#error').clone().text(function(index,text){
-        return text.replace('{0}', input);
+    if (cmd_result.length === 0)
+      cmd_result = $('#error').clone().text(function(index,text){
+        return text.replace('{0}', input_cmd);
       });
 
-    switch (input) {
+    switch (input_cmd) {
       case 'clear':
         clear_console();
         return;
@@ -68,9 +74,9 @@ function run_command(){
         return;
 
       case 'history':
-        element = $('<div>')
+        cmd_result = $('<div>')
         for (i = 0; i < cmd_list.length; i++) {
-          element.append($('<div>').text((i+1) + ': ' + cmd_list[i]))
+          cmd_result.append($('<div style="white-space:pre">').text((i+1) + ': ' + cmd_list[i].trim()))
         }
         break;
 
@@ -78,17 +84,15 @@ function run_command(){
       case 'github':
       case 'blog':
       case 'facebook':
-        window.open(element.find('a').attr('href'), '_blank');
+        window.open(cmd_result.find('a').attr('href'), '_blank');
         break;
     }
 
-    element.find('a').click()
-
     // Create a clone to show as command output
-    output = element.clone().removeAttr('id').removeClass('html_template')
+    output = cmd_result.clone().removeAttr('id').removeClass('html_template')
   }
 
-  var prompt = $('#prompt').clone().append($('<span>').html(raw_input.replaceAll(' ', '&nbsp;'))).removeAttr('id').removeClass('html_template')
+  var prompt = $('#prompt').clone().append($('<span style="white-space:pre">').text(input)).removeAttr('id').removeClass('html_template')
 
   // Get command output in HTML format
   var cmd_output = $('<div>').append(prompt).append(output).append('<br/>');
@@ -100,7 +104,7 @@ function run_command(){
   cmd.val('');
 
   // Append input command to command list
-  if (input != ''){
+  if (input_cmd != ''){
     cmd_list.push(input);
     cmd_index = cmd_list.length;
   }
