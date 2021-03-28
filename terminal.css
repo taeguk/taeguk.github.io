@@ -137,7 +137,7 @@ body {
   animation: blink 1200ms linear infinite;
 }
 
-input, textarea, select { 
+pre, input, textarea, select { 
   font-family: inherit; 
   font-size: inherit;
 }
