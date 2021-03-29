@@ -39239,7 +39239,7 @@ function getAbsolutePath (filePath) {
   return targetDir
 }
 
-exports.cd = async function (dir) {
+exports.cd = async (dir) => {
   let targetDir = getAbsolutePath(dir)
   const type = targetDir === '/' ? 'dir' : await getPathType(targetDir)
 
@@ -39261,7 +39261,7 @@ exports.cd = async function (dir) {
   }
 }
 
-exports.autoCompleteDir = async function (keyword) {
+exports.autoCompleteDir = async (keyword) => {
   const curDir = $('.current_location').first().text()
 
   // First, try to find matched directory in childs.
@@ -39281,7 +39281,7 @@ exports.autoCompleteDir = async function (keyword) {
     return path.relative(curDir, data.CommonPrefixes[0].Prefix) + '/'
 }
 
-exports.autoCompleteFile = async function (keyword) {
+exports.autoCompleteFile = async (keyword) => {
   const curDir = $('.current_location').first().text()
   const prefix = getFileKeyForS3(curDir + '/' + keyword)
   const data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Prefix: prefix, MaxKeys: 1}))
@@ -39352,33 +39352,33 @@ async function listObjectsFromS3 (dir) {
   return data
 }
 
-exports.ls = async function () {
+exports.ls = async () => {
   const curDir = $('.current_location').first().text()
   const data = await listObjectsFromS3(curDir)
   let result = $('<pre>')
 
-  data.CommonPrefixes.forEach(commonPrefix => {
+  for (const commonPrefix of data.CommonPrefixes) {
     const dirPath = commonPrefix.Prefix
     const dirName = path.basename(dirPath) + '/'
 
     result.append($(document.createTextNode(dirName + '\n')))
-  })
+  }
 
-  data.Contents.forEach(content => {
+  for (const content of data.Contents) {
     const filePath = content.Key
     const fileName = path.basename(filePath)
     const fileSize = content.Size
     const lastModified = content.LastModified
 
     result.append($(document.createTextNode(fileName + '\n')))
-  })
+  }
 
   return result
 }
 
-exports.cat = async function (filePath) {
-  filePath = getAbsolutePath(filePath)
-  const type = await getPathType(filePath)
+exports.cat = async (filePath) => {
+  const absFilePath = getAbsolutePath(filePath)
+  const type = await getPathType(absFilePath)
 
   const streamToString = (stream) =>
     new Promise((resolve, reject) => {
@@ -39394,7 +39394,7 @@ exports.cat = async function (filePath) {
       throw new Error('is a directory: ' + filePath)
 
     case 'file':
-      const key = getFileKeyForS3(filePath)
+      const key = getFileKeyForS3(absFilePath)
       const {Body} = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
       const data = await Body.getReader().read()
       const text = Buffer.from(data.value).toString('utf-8')
@@ -39408,17 +39408,24 @@ exports.cat = async function (filePath) {
   }
 }
 
-exports.redirectToFile = async function (filePath, content) {
-  filePath = getAbsolutePath(filePath)
-  const type = await getPathType(filePath)
+exports.redirectToFile = async (filePath, content) => {
+  const absFilePath = getAbsolutePath(filePath)
+  const lastChar = absFilePath.substr(-1)
+  const type = await getPathType(absFilePath)
 
   switch (type) {
     case 'dir':
       throw new Error('is a directory: ' + filePath)
 
-    case 'file':
     case 'not_exists':
-      const key = getFileKeyForS3(filePath)
+      if (lastChar === '/')
+        throw new Error('no such file or directory: ' + filePath)
+      else {
+        // the path means file, not directory. So pass to next case to make the file.
+      }
+
+    case 'file':
+      const key = getFileKeyForS3(absFilePath)
       await s3.send(new PutObjectCommand({Bucket: 'taeguk-github-io-public', Key: key, Body: content}))
       break
 
@@ -39441,7 +39448,7 @@ let cmdHistories = []
 let cmdCursor = 0
 let availableCmds = $('.command').map((index, dom) => { return dom.id }).toArray()
 
-$('#terminal__prompt--command').keydown(async function(event){
+$('#terminal__prompt--command').keydown(async (event) => {
   // Number 13 is the 'Enter' key on the keyboard
   if (event.keyCode === 13) {
     // Cancel the default action, if needed
@@ -39572,9 +39579,8 @@ async function runCommand(){
     if (redirectTargetFiles.length > 0) {
       try {
         const content = cmdResult.text()
-        await redirectTargetFiles.forEach(targetFile =>
-          filesystem.redirectToFile(targetFile, content)
-        )
+        for (const targetFile of redirectTargetFiles)
+          await filesystem.redirectToFile(targetFile, content)
         cmdResult = $('')
       } catch (err) {
         console.log(err)

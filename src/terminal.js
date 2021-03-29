@@ -10,7 +10,7 @@ let cmdHistories = []
 let cmdCursor = 0
 let availableCmds = $('.command').map((index, dom) => { return dom.id }).toArray()
 
-$('#terminal__prompt--command').keydown(async function(event){
+$('#terminal__prompt--command').keydown(async (event) => {
   // Number 13 is the 'Enter' key on the keyboard
   if (event.keyCode === 13) {
     // Cancel the default action, if needed
@@ -141,9 +141,8 @@ async function runCommand(){
     if (redirectTargetFiles.length > 0) {
       try {
         const content = cmdResult.text()
-        await redirectTargetFiles.forEach(targetFile =>
-          filesystem.redirectToFile(targetFile, content)
-        )
+        for (const targetFile of redirectTargetFiles)
+          await filesystem.redirectToFile(targetFile, content)
         cmdResult = $('')
       } catch (err) {
         console.log(err)
