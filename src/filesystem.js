@@ -15,35 +15,45 @@ const s3 = new S3Client({
   }),
 });
 
-function getAbsolutePath (filePath) {
-  const curDir = $('.current_location').first().text()
-  let targetDir
-
-  if (filePath.startsWith('/'))
-    targetDir = filePath
-  else
-    targetDir = curDir + '/' + filePath
-
-  targetDir = path.normalize(targetDir)
-  return targetDir
+// NOTE: There is no trailing slash in return value.
+function getAbsoluteCurrentPath () {
+  return $('.current_location').first().text().trim()
 }
 
-exports.cd = async (dir) => {
-  let targetDir = getAbsolutePath(dir)
-  const type = targetDir === '/' ? 'dir' : await getPathType(targetDir)
+function setAbsolueCurrentPath (absCurPath) {
+  // remove trailing slash except foremost slash
+  absCurPath = absCurPath.trim()
+  absCurPath = absCurPath === '/' ? '/' : absCurPath.replace(/\/$/, "")
+  $('.current_location').text(absCurPath)
+}
+
+function getAbsolutePath (path_) {
+  const absCurPath = getAbsoluteCurrentPath()
+  let absPath
+
+  if (path_.startsWith('/'))
+    absPath = path_
+  else
+    absPath = absCurPath + '/' + path_
+
+  absPath = path.normalize(absPath)
+  return absPath
+}
+
+exports.cd = async (dirPath) => {
+  let absDirPath = getAbsolutePath(dirPath)
+  const type = absDirPath === '/' ? 'dir' : await getPathType(absDirPath)
 
   switch (type) {
     case 'dir':
-      // remove trailing slash except foremost slash
-      let location = targetDir === '/' ? '/' : targetDir.replace(/\/$/, "")
-      $('.current_location').text(location)
+      setAbsolueCurrentPath(absDirPath)
       return $('')
 
     case 'file':
-      throw new Error('not a directory: ' + dir)
+      throw new Error('not a directory: ' + dirPath)
 
     case 'not_exists':
-      throw new Error('no such file or directory: ' + dir)
+      throw new Error('no such file or directory: ' + dirPath)
 
     default:
       throw new Error('unknown error')
@@ -51,11 +61,11 @@ exports.cd = async (dir) => {
 }
 
 exports.autoCompleteDir = async (keyword) => {
-  const curDir = $('.current_location').first().text()
+  const absCurPath = getAbsoluteCurrentPath()
 
   // First, try to find matched directory in childs.
-  var prefix = getDirKeyForS3(curDir + '/' + keyword)
-  var data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: prefix}))
+  let prefix = getDirKeyForS3(absCurPath + '/' + keyword)
+  let data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: prefix}))
 
   // If not found, try to matched directory in siblings.
   if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0) {
@@ -67,29 +77,31 @@ exports.autoCompleteDir = async (keyword) => {
   if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0)
     return keyword
   else
-    return path.relative(curDir, data.CommonPrefixes[0].Prefix) + '/'
+    return path.relative(absCurPath, data.CommonPrefixes[0].Prefix) + '/'
 }
 
 exports.autoCompleteFile = async (keyword) => {
-  const curDir = $('.current_location').first().text()
-  const prefix = getFileKeyForS3(curDir + '/' + keyword)
+  const absCurPath = getAbsoluteCurrentPath()
+  const prefix = getFileKeyForS3(absCurPath + '/' + keyword)
   const data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Prefix: prefix, MaxKeys: 1}))
 
   if (data.Contents !== undefined && data.Contents.length > 0)
-    return path.relative(curDir, data.Contents[0].Key)
+    return path.relative(absCurPath, data.Contents[0].Key)
   else
     return keyword
 }
 
-async function getPathType (fileOrDir) {
-  const dirKey = getDirKeyForS3(fileOrDir)
+// NOTE: Due to the nature of S3, fileOrDir can be ambiguous. In other words, it can mean file and directory both.
+// In the ambiguous case, it returns 'dir'.
+async function getPathType (absPath) {
+  const dirKey = getDirKeyForS3(absPath)
   const dirData = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Prefix: dirKey, MaxKeys: 1}))
   const isDirExists = dirData.Contents !== undefined && dirData.Contents.length > 0
 
   if (isDirExists)
     return 'dir'
   else {
-    const fileKey = getFileKeyForS3(fileOrDir)
+    const fileKey = getFileKeyForS3(absPath)
     let isFileExists
     try {
       await s3.send(new HeadObjectCommand({Bucket: 'taeguk-github-io-public', Delimiter: '/', Key: fileKey}))
@@ -108,30 +120,31 @@ async function getPathType (fileOrDir) {
   }
 }
 
-function getFileKeyForS3 (filePath) {
+// NOTE: It keeps trailing slash.
+// If `absFilePath` has trailing slash, it means directory.
+// S3 will return a file which has same name if we erase trailing slash here.
+function getFileKeyForS3 (absPath) {
   // - make it sure to be normalized.
   // - remove foremost slash.
-  // - remove trailing slash.
-  filePath = path.normalize(filePath)
-  filePath = filePath[0] === '/' ? filePath.substring(1) : filePath
-  filePath = filePath.replace(/\/$/, "")
+  let key = path.normalize(absPath)
+  key = key[0] === '/' ? key.substring(1) : key
 
-  return filePath
+  return key
 }
 
-function getDirKeyForS3 (dir) {
+function getDirKeyForS3 (absDirPath) {
   // make it sure to be normalized like "/aaaaa/bb/ccc".
-  dir = path.normalize(dir)
+  let key = path.normalize(absDirPath)
 
   // "/" -> ""
   // "/aaaaa/bb/ccc" -> "aaaaa/bb/ccc/"
   // "/aaaaa/bb/ccc/" -> "aaaaa/bb/ccc/"
-  return dir === '/' ? '' : dir.substring(1).replace(/\/$/, "") + '/'
+  return key === '/' ? '' : key.substring(1).replace(/\/$/, "") + '/'
 }
 
-async function listObjectsFromS3 (dir) {
-  const dirKey = getDirKeyForS3(dir)
-  let data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: dirKey}))
+async function listObjectsFromS3 (absDirPath) {
+  const key = getDirKeyForS3(absDirPath)
+  let data = await s3.send(new ListObjectsV2Command({Bucket: 'taeguk-github-io-public', Delimiter: '/', Prefix: key}))
 
   if (data.CommonPrefixes === undefined)
     data.CommonPrefixes = []
@@ -142,8 +155,8 @@ async function listObjectsFromS3 (dir) {
 }
 
 exports.ls = async () => {
-  const curDir = $('.current_location').first().text()
-  const data = await listObjectsFromS3(curDir)
+  const absCurPath = getAbsoluteCurrentPath()
+  const data = await listObjectsFromS3(absCurPath)
   let result = $('<pre>')
 
   for (const commonPrefix of data.CommonPrefixes) {
@@ -167,7 +180,6 @@ exports.ls = async () => {
 
 exports.cat = async (filePath) => {
   const absFilePath = getAbsolutePath(filePath)
-  const type = await getPathType(absFilePath)
 
   const streamToString = (stream) =>
     new Promise((resolve, reject) => {
@@ -178,22 +190,17 @@ exports.cat = async (filePath) => {
       stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
     })
 
-  switch (type) {
-    case 'dir':
-      throw new Error('is a directory: ' + filePath)
-
-    case 'file':
-      const key = getFileKeyForS3(absFilePath)
-      const {Body} = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
-      const data = await Body.getReader().read()
-      const text = Buffer.from(data.value).toString('utf-8')
-      return $('<pre>').text(text)
-
-    case 'not_exists':
-      throw new Error('no such file or directory: ' + filePath)
-
-    default:
-      throw new Error('unknown error')
+  try {
+    const key = getFileKeyForS3(absFilePath)
+    const {Body} = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
+    const data = await Body.getReader().read()
+    const text = Buffer.from(data.value).toString('utf-8')
+    return $('<pre>').text(text)
+  } catch (err) {
+    if (err.message === 'NoSuchKey')
+      throw new Error('no such file: ' + filePath)
+    else
+      throw err
   }
 }
 
