@@ -211,8 +211,9 @@ async function assertFileExists (filePath) {
         throw new Error('is a directory: ' + filePath)
       else 
         // TODO: Do something to make sure that the file exists or not.
-        // The path means file, not directory. So the file can exist or not. But no try to make sure it.
-        break
+        // The path means file, not directory. So the file can exist or not.
+        // There is no clean way. So just assume that the file doesn't exist.
+        throw new Error('no such file: ' + filePath)
 
     case 'file':
       break
@@ -260,7 +261,7 @@ exports.rm = async (filePath) => {
 
   const absFilePath = getAbsolutePath(filePath)
   const key = getFileKeyForS3(absFilePath)
-  const response = await s3.send(new DeleteObjectCommand({Bucket: s3BucketName, Key: key}))
+  await s3.send(new DeleteObjectCommand({Bucket: s3BucketName, Key: key}))
 }
 
 exports.cp = async (srcFilePath, dstFilePath) => {
