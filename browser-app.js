@@ -39255,7 +39255,7 @@ function getAbsolutePath (path_) {
 
 exports.cd = async (dirPath) => {
   let absDirPath = getAbsolutePath(dirPath)
-  const type = absDirPath === '/' ? 'dir' : await getPathType(absDirPath)
+  const type = await getPathType(absDirPath)
 
   switch (type) {
     case 'dir':
@@ -39444,7 +39444,7 @@ async function assertFileIsCreatable (filePath) {
 
     case 'not_exists':
       if (lastChar === '/')
-        // The path means directory. So, it can't be a file.
+        // The path means a directory. So, it can't be a file.
         throw new Error('no such file or directory: ' + filePath)
       else
         break
