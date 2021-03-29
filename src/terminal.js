@@ -126,6 +126,11 @@ async function runCommand(){
             cmdResult = await filesystem.ls()
           break
 
+        case 'cat':
+          if (params.length === 1)
+            cmdResult = await filesystem.cat(params[0])
+          break
+
         case 'rm':
           if (params.length > 0) {
             for (const filePath of params)
@@ -134,9 +139,11 @@ async function runCommand(){
           }
           break
 
-        case 'cat':
-          if (params.length > 0)
-            cmdResult = await filesystem.cat(params[0])
+        case 'cp':
+          if (params.length == 2) {
+            await filesystem.cp(params[0], params[1])
+            cmdResult = $('')
+          }
           break
       }
     } catch (err) {
