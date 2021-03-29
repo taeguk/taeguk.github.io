@@ -1,5 +1,5 @@
 const path = require('path').posix
-const {S3Client, ListObjectsV2Command, HeadObjectCommand, GetObjectCommand, PutObjectCommand} = require('@aws-sdk/client-s3');
+const {S3Client, ListObjectsV2Command, HeadObjectCommand, GetObjectCommand, PutObjectCommand, DeleteObjectCommand} = require('@aws-sdk/client-s3');
 const {CognitoIdentityClient} = require("@aws-sdk/client-cognito-identity");
 const {fromCognitoIdentityPool} = require("@aws-sdk/credential-provider-cognito-identity");
 
@@ -47,7 +47,7 @@ exports.cd = async (dirPath) => {
   switch (type) {
     case 'dir':
       setAbsolueCurrentPath(absDirPath)
-      return $('')
+      break
 
     case 'file':
       throw new Error('not a directory: ' + dirPath)
@@ -181,15 +181,6 @@ exports.ls = async () => {
 exports.cat = async (filePath) => {
   const absFilePath = getAbsolutePath(filePath)
 
-  const streamToString = (stream) =>
-    new Promise((resolve, reject) => {
-      console.log(stream)
-      const chunks = []
-      stream.on("data", (chunk) => chunks.push(chunk))
-      stream.on("error", reject)
-      stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
-    })
-
   try {
     const key = getFileKeyForS3(absFilePath)
     const {Body} = await s3.send(new GetObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
@@ -217,13 +208,46 @@ exports.redirectToFile = async (filePath, content) => {
       if (lastChar === '/')
         throw new Error('no such file or directory: ' + filePath)
       else {
-        // the path means file, not directory. So pass to next case to make the file.
+        // The path means file, not directory. So pass to next case to make the file.
       }
 
     case 'file':
       const key = getFileKeyForS3(absFilePath)
       await s3.send(new PutObjectCommand({Bucket: 'taeguk-github-io-public', Key: key, Body: content}))
       break
+
+    default:
+      throw new Error('unknown error')
+  }
+}
+
+exports.rm = async (filePath) => {
+  const absFilePath = getAbsolutePath(filePath)
+  const lastChar = absFilePath.substr(-1)
+  const type = await getPathType(absFilePath)
+
+  switch (type) {
+    case 'not_exists':
+      throw new Error('no such file or directory: ' + filePath)
+
+    case 'dir':
+      if (lastChar === '/')
+        throw new Error('is a directory: ' + filePath)
+      else {
+        // If the path means file, not directory, the file can also exist. So pass to next case to try to remove the file.
+      }
+
+    case 'file':
+      try {
+        const key = getFileKeyForS3(absFilePath)
+        await s3.send(new DeleteObjectCommand({Bucket: 'taeguk-github-io-public', Key: key}))
+        return
+      } catch (err) {
+        if (err.message === 'NoSuchKey')
+          throw new Error('no such file: ' + filePath)
+        else
+          throw err
+      }
 
     default:
       throw new Error('unknown error')

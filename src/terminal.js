@@ -116,15 +116,22 @@ async function runCommand(){
           break;
 
         case 'cd':
-          if (params.length > 0)
-            cmdResult = await filesystem.cd(params[0])
-          else
-            cmdResult = await filesystem.cd('/')
+          const dirPath = params.length > 0 ? params[0] : '/'
+          await filesystem.cd(dirPath)
+          cmdResult = $('')
           break
 
         case 'ls':
           if (params.length === 0)
             cmdResult = await filesystem.ls()
+          break
+
+        case 'rm':
+          if (params.length > 0) {
+            for (const filePath of params)
+              await filesystem.rm(filePath)
+            cmdResult = $('')
+          }
           break
 
         case 'cat':
