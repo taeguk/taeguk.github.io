@@ -39648,7 +39648,8 @@ async function runCommand(){
       }
     } catch (err) {
       console.log(err)
-      cmdResult = $('<pre>').text(err.message)
+      const errorMessage = err.message.trim() === '' ? 'unknown error' : err.message
+      cmdResult = $('<pre>').text(errorMessage)
     }
 
     // If necessary, redirect results to files.
@@ -39660,7 +39661,8 @@ async function runCommand(){
         cmdResult = $('')
       } catch (err) {
         console.log(err)
-        cmdResult = $('<pre>').text(err.message)
+        const errorMessage = err.message.trim() === '' ? 'unknown error' : err.message
+        cmdResult = $('<pre>').text(errorMessage)
       }
     }
 
