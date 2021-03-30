@@ -275,7 +275,7 @@ exports.cp = async (srcFilePath, dstFilePath) => {
     const srcKey = getFileKeyForS3(absSrcFilePath)
     // NOTE: It is inserted to http header as X-Amz-Copy-Source. But aws sdk don't encode the value.
     // So we should encodeURI for the value ourself.
-    const copySource = encodeURI('/' + s3BucketName + '/' + srcKey)
+    const copySource = encodeURIComponent('/' + s3BucketName + '/' + srcKey)
     const dstKey = getFileKeyForS3(absDstFilePath)
     await s3.send(new CopyObjectCommand({Bucket: s3BucketName, CopySource: copySource, Key: dstKey}))
     return
