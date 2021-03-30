@@ -51,11 +51,11 @@ function parseInput() {
   // ["1 2", "3 4"] => ["1", "3"]
   const targetFiles = redirectParts.map((v,i,a) => { return v.trim().split(' ')[0] })
 
-  return [rawInput, cmd, params, targetFiles]
+  return [rawInput, cmdAndParams, cmd, params, targetFiles]
 }
 
 async function runCommand(){
-  const [rawInput, cmd, params, redirectTargetFiles] = parseInput()
+  const [rawInput, cmdAndParams, cmd, params, redirectTargetFiles] = parseInput()
 
   console.log(
     'raw input : ' + rawInput + '\n' +
@@ -124,6 +124,11 @@ async function runCommand(){
         case 'ls':
           if (params.length === 0)
             cmdResult = await filesystem.ls()
+          break
+
+        case 'echo':
+          const content = (cmdAndParams.slice(cmdAndParams.indexOf('echo') + 4)).trim()
+          cmdResult = $('<pre>').text(content)
           break
 
         case 'cat':
@@ -212,7 +217,7 @@ function cycleCommand(direction){
 }
 
 async function autoComplete(){
-  const [rawInput, cmd, params, redirectTargetFiles] = parseInput()
+  const [rawInput, cmdAndParams, cmd, params, redirectTargetFiles] = parseInput()
   const trimmedRawInput = rawInput.trim()
   const lastCharOfTrimned = trimmedRawInput.substr(-1)
   const lastChar = rawInput.substr(-1)
