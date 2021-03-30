@@ -121,7 +121,7 @@ body {
   color: #dddddd;
 }
 #terminal__prompt--command {
-  width: calc(100% - 145px);
+  width: calc(100% - 300px);
   border: 0;
   padding: 0;
   background: inherit;
@@ -215,6 +215,9 @@ a:visited {
 }
 
 @media (max-width: 540px) {
+  #terminal__prompt--command {
+    width: calc(100% - 145px);
+  }
   #terminal__prompt--logo-large {
     display: none;
   }
