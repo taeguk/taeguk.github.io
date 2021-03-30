@@ -39652,6 +39652,28 @@ async function runCommand(){
             cmdResult = $('')
           }
           break
+
+        // TODO: resource leak occurs when an user cancel uploading.
+        case 'upload':
+          if (params.length === 0) {
+            let fileInput = $('<input type="file" name="files[]">')
+
+            let fileUploadPromise = new Promise((resolve, reject) => {
+              fileInput.change(() => {
+                const file = fileInput[0].files[0]
+                var reader = new FileReader()
+                reader.onloadend = resolve
+                reader.onerror = reject
+                reader.readAsText(file);
+              })
+            })
+
+            fileInput.trigger('click')
+            const progress = await fileUploadPromise
+
+            cmdResult = $('<pre>').text(progress.target.result)
+          }
+          break
       }
     } catch (err) {
       console.log(err)
