@@ -44,21 +44,15 @@ function getAbsolutePath (path_) {
 
 exports.cd = async (dirPath) => {
   let absDirPath = getAbsolutePath(dirPath)
-  const type = await getPathType(absDirPath)
+  const isDirExists = await checkDirExists(absDirPath)
 
-  switch (type) {
-    case 'dir':
-      setAbsolueCurrentPath(absDirPath)
-      break
+  if (!isDirExists) {
+    const isFileExists = await checkFileExists(absDirPath)
 
-    case 'file':
+    if (isFileExists)
       throw new Error('not a directory: ' + dirPath)
-
-    case 'not_exists':
+    else
       throw new Error('no such file or directory: ' + dirPath)
-
-    default:
-      throw new Error('unknown error')
   }
 }
 
@@ -95,33 +89,28 @@ exports.autoCompleteFile = async (keyword) => {
     return keyword
 }
 
-// NOTE: Due to the nature of S3, fileOrDir can be ambiguous. In other words, it can mean file and directory both.
-// In the ambiguous case, it returns 'dir'.
-async function getPathType (absPath) {
+async function checkDirExists (absPath) {
   const dirKey = getDirKeyForS3(absPath)
   const dirData = await listObjectsFromS3(dirKey)
   const isDirExists = dirData.CommonPrefixes.length > 0 || dirData.Contents.length > 0
+  return isDirExists
+}
 
-  if (isDirExists)
-    return 'dir'
-  else {
-    const fileKey = getFileKeyForS3(absPath)
-    let isFileExists
-    try {
-      await s3.send(new HeadObjectCommand({Bucket: s3BucketName, Delimiter: '/', Key: fileKey}))
-      isFileExists = true
-    } catch (err) {
-      if (err.message === 'NotFound')
-        isFileExists = false
-      else
-        throw err
-    }
+async function checkFileExists (absPath) {
+  const fileKey = getFileKeyForS3(absPath)
+  let isFileExists
 
-    if (isFileExists)
-      return 'file'
+  try {
+    await s3.send(new HeadObjectCommand({Bucket: s3BucketName, Delimiter: '/', Key: fileKey}))
+    isFileExists = true
+  } catch (err) {
+    if (err.message === 'NotFound')
+      isFileExists = false
     else
-      return 'not_exists'
+      throw err
   }
+
+  return isFileExists
 }
 
 // NOTE: It keeps trailing slash.
@@ -213,53 +202,30 @@ exports.cat = async (filePath) => {
 
 async function assertFileExists (filePath) {
   const absFilePath = getAbsolutePath(filePath)
-  const lastChar = absFilePath.substr(-1)
-  const type = await getPathType(absFilePath)
+  const isFileExists = await checkFileExists(absFilePath)
 
-  switch (type) {
-    case 'not_exists':
+  if (!isFileExists) {
+    const isDirExists = await checkDirExists(absFilePath)
+
+    if (isDirExists)
+      throw new Error('is a directory: ' + filePath)
+    else
       throw new Error('no such file or directory: ' + filePath)
-
-    case 'dir':
-      if (lastChar === '/')
-        throw new Error('is a directory: ' + filePath)
-      else 
-        // TODO: Do something to make sure that the file exists or not.
-        // The path means file, not directory. So the file can exist or not.
-        // There is no clean way. So just assume that the file doesn't exist.
-        throw new Error('no such file: ' + filePath)
-
-    case 'file':
-      break
-
-    default:
-      throw new Error('unknown error')
   }
 }
 
 async function assertFileIsCreatable (filePath) {
   const absFilePath = getAbsolutePath(filePath)
   const lastChar = absFilePath.substr(-1)
-  const type = await getPathType(absFilePath)
+  const isDirExists = await checkDirExists(absFilePath)
 
-  switch (type) {
-    case 'dir':
-      throw new Error('is a directory: ' + filePath)
+  if (isDirExists)
+    throw new Error('is a directory: ' + filePath)
 
-    case 'not_exists':
-      if (lastChar === '/')
-        // The path means a directory. So, it can't be a file.
-        throw new Error('no such file or directory: ' + filePath)
-      else
-        break
-
-    case 'file':
-      // Allow overwriting.
-      break
-
-    default:
-      throw new Error('unknown error')
-  }
+  // The path means a directory. So, it can't be a file.
+  // Use same error message in general shell.
+  if (lastChar === '/')
+    throw new Error('no such file or directory: ' + filePath)
 }
 
 exports.redirectToFile = async (filePath, content) => {
