@@ -39364,6 +39364,12 @@ async function listObjectsFromS3 (absDirPath) {
   if (data.Contents === undefined)
     data.Contents = []
 
+  // There can be object which key is same to directory exactly.
+  // We should erase it to make reasonable output to users.
+  data.Contents = data.Contents.filter((content) => {
+    return content.Key !== key
+  })
+
   return data
 }
 
