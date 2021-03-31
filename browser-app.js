@@ -39278,28 +39278,30 @@ exports.autoCompleteDir = async (keyword) => {
 
   // First, try to find matched directory in childs.
   let prefix = getDirKeyForS3(absCurPath + '/' + keyword)
-  let data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Delimiter: '/', Prefix: prefix}))
+  let data = await listObjectsFromS3(prefix)
 
   // If not found, try to matched directory in siblings.
-  if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0) {
+  if (data.CommonPrefixes.length === 0) {
     // Remove trailing slash.
     prefix = prefix.replace(/\/$/, "")
-    data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Delimiter: '/', Prefix: prefix}))
+    data = await listObjectsFromS3(prefix)
   }
 
-  if (data.CommonPrefixes === undefined || data.CommonPrefixes.length === 0)
-    return keyword
-  else
+  if (data.CommonPrefixes.length > 0)
     return path.relative(absCurPath, data.CommonPrefixes[0].Prefix) + '/'
+  else
+    return keyword
 }
 
 exports.autoCompleteFile = async (keyword) => {
   const absCurPath = getAbsoluteCurrentPath()
   const prefix = getFileKeyForS3(absCurPath + '/' + keyword)
-  const data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Prefix: prefix, MaxKeys: 1}))
+  const data = await listObjectsFromS3(prefix)
 
-  if (data.Contents !== undefined && data.Contents.length > 0)
+  if (data.Contents.length > 0)
     return path.relative(absCurPath, data.Contents[0].Key)
+  else if (data.CommonPrefixes.length > 0)
+    return path.relative(absCurPath, data.CommonPrefixes[0].Prefix) + '/'
   else
     return keyword
 }
@@ -39308,8 +39310,8 @@ exports.autoCompleteFile = async (keyword) => {
 // In the ambiguous case, it returns 'dir'.
 async function getPathType (absPath) {
   const dirKey = getDirKeyForS3(absPath)
-  const dirData = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Prefix: dirKey, MaxKeys: 1}))
-  const isDirExists = dirData.Contents !== undefined && dirData.Contents.length > 0
+  const dirData = await listObjectsFromS3(dirKey)
+  const isDirExists = dirData.CommonPrefixes.length > 0 || dirData.Contents.length > 0
 
   if (isDirExists)
     return 'dir'
@@ -39355,9 +39357,13 @@ function getDirKeyForS3 (absDirPath) {
   return key === '/' ? '' : key.substring(1).replace(/\/$/, "") + '/'
 }
 
-async function listObjectsFromS3 (absDirPath) {
+async function listObjectsOfDirFromS3 (absDirPath) {
   const key = getDirKeyForS3(absDirPath)
-  let data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Delimiter: '/', Prefix: key}))
+  return await listObjectsFromS3(key)
+}
+
+async function listObjectsFromS3 (prefix) {
+  let data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Delimiter: '/', Prefix: prefix}))
 
   if (data.CommonPrefixes === undefined)
     data.CommonPrefixes = []
@@ -39366,16 +39372,18 @@ async function listObjectsFromS3 (absDirPath) {
 
   // There can be object which key is same to directory exactly.
   // We should erase it to make reasonable output to users.
-  data.Contents = data.Contents.filter((content) => {
-    return content.Key !== key
-  })
+  if (prefix.substr(-1) === '/') {
+    data.Contents = data.Contents.filter((content) => {
+      return content.Key !== prefix
+    })
+  }
 
   return data
 }
 
 exports.ls = async () => {
   const absCurPath = getAbsoluteCurrentPath()
-  const data = await listObjectsFromS3(absCurPath)
+  const data = await listObjectsOfDirFromS3(absCurPath)
   let result = $('<pre>')
 
   for (const commonPrefix of data.CommonPrefixes) {
@@ -39793,7 +39801,7 @@ async function autoComplete(){
 
   const indexToBeInserted = rawInput.length - keyword.length
   var modifiedCmdLine = rawInput.slice(0, indexToBeInserted) + autoCompleted
-  if (target !== 'dir' && autoCompleted !== keyword)
+  if (autoCompleted.substr(-1) !== '/' && autoCompleted !== keyword)
     modifiedCmdLine += ' '
   $('#terminal__prompt--command').val(modifiedCmdLine)
 

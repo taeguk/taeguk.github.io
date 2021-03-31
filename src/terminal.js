@@ -285,7 +285,7 @@ async function autoComplete(){
 
   const indexToBeInserted = rawInput.length - keyword.length
   var modifiedCmdLine = rawInput.slice(0, indexToBeInserted) + autoCompleted
-  if (target !== 'dir' && autoCompleted !== keyword)
+  if (autoCompleted.substr(-1) !== '/' && autoCompleted !== keyword)
     modifiedCmdLine += ' '
   $('#terminal__prompt--command').val(modifiedCmdLine)
 
