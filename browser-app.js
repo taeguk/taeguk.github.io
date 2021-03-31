@@ -39257,7 +39257,9 @@ exports.cd = async (dirPath) => {
   let absDirPath = getAbsolutePath(dirPath)
   const isDirExists = await checkDirExists(absDirPath)
 
-  if (!isDirExists) {
+  if (isDirExists)
+    setAbsolueCurrentPath(absDirPath)
+  else {
     const isFileExists = await checkFileExists(absDirPath)
 
     if (isFileExists)
