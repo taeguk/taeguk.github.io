@@ -1,6 +1,5 @@
 /*
-  Originally written by Kartike Bansal. (https://github.com/kraten/terminal-resume)
-  I copied that and modified for my purposes.
+  I refer some codes of https://github.com/kraten/terminal-resume
 */
 
 const filesystem = require('./filesystem.js')
@@ -49,13 +48,13 @@ function parseInput() {
 
   // Same hehavior of bash shell
   // ["1 2", "3 4"] => ["1", "3"]
-  const targetFiles = redirectParts.map((v,i,a) => { return v.trim().split(' ')[0] })
+  const redirectTargetFiles = redirectParts.map((v,i,a) => { return v.trim().split(' ')[0] })
 
-  return [rawInput, cmdAndParams, cmd, params, targetFiles]
+  return { rawInput, cmdAndParams, cmd, params, redirectTargetFiles }
 }
 
 async function runCommand(){
-  const [rawInput, cmdAndParams, cmd, params, redirectTargetFiles] = parseInput()
+  const { rawInput, cmdAndParams, cmd, params, redirectTargetFiles } = parseInput()
 
   console.log(
     'raw input : ' + rawInput + '\n' +
@@ -257,7 +256,7 @@ function cycleCommand(direction){
 }
 
 async function autoComplete(){
-  const [rawInput, cmdAndParams, cmd, params, redirectTargetFiles] = parseInput()
+  const { rawInput, cmdAndParams, cmd, params, redirectTargetFiles } = parseInput()
   const trimmedRawInput = rawInput.trim()
   const lastCharOfTrimned = trimmedRawInput.substr(-1)
   const lastChar = rawInput.substr(-1)
@@ -310,9 +309,10 @@ async function autoComplete(){
 }
 
 function autoCompleteCmd(keyword){
-  for (i = 0; i < availableCmds.length; i++)
-    if (availableCmds[i].startsWith(keyword))
-      return availableCmds[i]
+  for (const cmd of availableCmds) {
+    if (cmd.startsWith(keyword))
+      return cmd
+  }
   return keyword
 }
 
