@@ -39377,9 +39377,20 @@ async function listObjectsFromS3 (prefix, excludeDirFromContents = true) {
   return data
 }
 
-exports.ls = async () => {
-  const absCurPath = getAbsoluteCurrentPath()
-  const data = await listObjectsOfDirFromS3(absCurPath)
+exports.ls = async (dirPath = '') => {
+  const absDirPath = getAbsolutePath(dirPath)
+  const isDirExists = await checkDirExists(absDirPath)
+
+  if (!isDirExists) {
+    const isFileExists = await checkFileExists(absDirPath)
+
+    if (isFileExists)
+      throw new Error('not a directory: ' + dirPath)
+    else
+      throw new Error('no such file or directory: ' + dirPath)
+  }
+
+  const data = await listObjectsOfDirFromS3(absDirPath)
   let result = $('<pre>')
 
   for (const commonPrefix of data.CommonPrefixes) {
@@ -39653,6 +39664,8 @@ async function runCommand(){
         case 'ls':
           if (params.length === 0)
             cmdResult = await filesystem.ls()
+          else if (params.length === 1)
+            cmdResult = await filesystem.ls(params[0])
           break
 
         case 'mkdir':
@@ -39798,10 +39811,8 @@ async function autoComplete(){
   }
   // It means typing a command is finished. So the place is for parameters.
   else if (params.length > 0 || lastChar !== lastCharOfTrimned) {
-    if (cmd === 'cd')
+    if (cmd === 'cd' || cmd === 'ls' || cmd === 'mkdir' || cmd === 'rmdir')
       target = 'dir'
-    else if (cmd === 'cat')
-      target = 'file'
     else
       target = 'file'
 

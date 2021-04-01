@@ -124,6 +124,8 @@ async function runCommand(){
         case 'ls':
           if (params.length === 0)
             cmdResult = await filesystem.ls()
+          else if (params.length === 1)
+            cmdResult = await filesystem.ls(params[0])
           break
 
         case 'mkdir':
@@ -269,10 +271,8 @@ async function autoComplete(){
   }
   // It means typing a command is finished. So the place is for parameters.
   else if (params.length > 0 || lastChar !== lastCharOfTrimned) {
-    if (cmd === 'cd')
+    if (cmd === 'cd' || cmd === 'ls' || cmd === 'mkdir' || cmd === 'rmdir')
       target = 'dir'
-    else if (cmd === 'cat')
-      target = 'file'
     else
       target = 'file'
 

@@ -166,9 +166,20 @@ async function listObjectsFromS3 (prefix, excludeDirFromContents = true) {
   return data
 }
 
-exports.ls = async () => {
-  const absCurPath = getAbsoluteCurrentPath()
-  const data = await listObjectsOfDirFromS3(absCurPath)
+exports.ls = async (dirPath = '') => {
+  const absDirPath = getAbsolutePath(dirPath)
+  const isDirExists = await checkDirExists(absDirPath)
+
+  if (!isDirExists) {
+    const isFileExists = await checkFileExists(absDirPath)
+
+    if (isFileExists)
+      throw new Error('not a directory: ' + dirPath)
+    else
+      throw new Error('no such file or directory: ' + dirPath)
+  }
+
+  const data = await listObjectsOfDirFromS3(absDirPath)
   let result = $('<pre>')
 
   for (const commonPrefix of data.CommonPrefixes) {
