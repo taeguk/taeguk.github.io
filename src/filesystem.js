@@ -92,10 +92,15 @@ exports.autoCompleteFile = async (keyword) => {
 }
 
 async function checkDirExists (absPath) {
-  const dirKey = getDirKeyForS3(absPath)
-  const dirData = await listObjectsFromS3(dirKey, excludeDirFromContents = false)
-  const isDirExists = dirData.CommonPrefixes.length > 0 || dirData.Contents.length > 0
+  const { isDirExists, _ } = await checkDirExistsAndEmpty(absPath)
   return isDirExists
+}
+
+async function checkDirExistsAndEmpty (absPath) {
+  const dirData = await listObjectsOfDirFromS3(absPath, excludeDirFromContents = false)
+  const isDirExists = dirData.CommonPrefixes.length > 0 || dirData.Contents.length > 0
+  const isDirExistsAndEmpty = dirData.CommonPrefixes.length === 0 && dirData.Contents.length === 1
+  return { isDirExists, isDirExistsAndEmpty }
 }
 
 async function checkFileExists (absPath) {
@@ -137,9 +142,9 @@ function getDirKeyForS3 (absDirPath) {
   return key === '/' ? '' : key.substring(1).replace(/\/$/, "") + '/'
 }
 
-async function listObjectsOfDirFromS3 (absDirPath) {
+async function listObjectsOfDirFromS3 (absDirPath, excludeDirFromContents = true) {
   const key = getDirKeyForS3(absDirPath)
-  return await listObjectsFromS3(key)
+  return await listObjectsFromS3(key, excludeDirFromContents)
 }
 
 async function listObjectsFromS3 (prefix, excludeDirFromContents = true) {
@@ -200,6 +205,28 @@ exports.mkdir = async (dirPath) => {
       const key = getDirKeyForS3(absDirPath)
       await s3.send(new PutObjectCommand({Bucket: s3BucketName, Key: key}))
     }
+  }
+}
+
+exports.rmdir = async (dirPath) => {
+  const absDirPath = getAbsolutePath(dirPath)
+  const { isDirExists, isDirExistsAndEmpty } = await checkDirExistsAndEmpty(absDirPath)
+
+  if (isDirExists) {
+    if (isDirExistsAndEmpty) {
+      const key = getDirKeyForS3(absDirPath)
+      await s3.send(new DeleteObjectCommand({Bucket: s3BucketName, Key: key}))
+    }
+    else
+      throw new Error('directory not empty: ' + dirPath)
+  }
+  else {
+    const isFileExists = await checkFileExists(absDirPath)
+
+    if (isFileExists)
+      throw new Error('not a directory: ' + dirPath)
+    else
+      throw new Error('no such file or directory: ' + dirPath)
   }
 }
 
