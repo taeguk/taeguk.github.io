@@ -39391,13 +39391,13 @@ exports.ls = async (dirPath = '') => {
   }
 
   const data = await listObjectsOfDirFromS3(absDirPath)
-  let result = $('<pre>')
+  let names = []
 
   for (const commonPrefix of data.CommonPrefixes) {
     const dirPath = commonPrefix.Prefix
     const dirName = path.basename(dirPath) + '/'
 
-    result.append($(document.createTextNode(dirName + '\n')))
+    names.push(dirName)
   }
 
   for (const content of data.Contents) {
@@ -39406,7 +39406,14 @@ exports.ls = async (dirPath = '') => {
     const fileSize = content.Size
     const lastModified = content.LastModified
 
-    result.append($(document.createTextNode(fileName + '\n')))
+    names.push(fileName)
+  }
+
+  names.sort()
+
+  let result = $('<pre>')
+  for (const name of names) {
+    result.append($(document.createTextNode(name + '\n')))
   }
 
   return result
