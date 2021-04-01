@@ -39315,6 +39315,9 @@ async function checkDirExistsAndEmpty (absPath) {
 }
 
 async function checkFileExists (absPath) {
+  if (absPath.substr(-1) === '/')
+    return false
+
   const fileKey = getFileKeyForS3(absPath)
   let isFileExists
 
@@ -39331,9 +39334,6 @@ async function checkFileExists (absPath) {
   return isFileExists
 }
 
-// NOTE: It keeps trailing slash.
-// If `absFilePath` has trailing slash, it means directory.
-// S3 will return a file which has same name if we erase trailing slash here.
 function getFileKeyForS3 (absPath) {
   // - make it sure to be normalized.
   // - remove foremost slash.
