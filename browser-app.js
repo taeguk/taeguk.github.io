@@ -39304,7 +39304,7 @@ exports.autoCompleteFile = async (keyword) => {
 
 async function checkDirExists (absPath) {
   const dirKey = getDirKeyForS3(absPath)
-  const dirData = await listObjectsFromS3(dirKey)
+  const dirData = await listObjectsFromS3(dirKey, excludeDirFromContents = false)
   const isDirExists = dirData.CommonPrefixes.length > 0 || dirData.Contents.length > 0
   return isDirExists
 }
@@ -39353,7 +39353,7 @@ async function listObjectsOfDirFromS3 (absDirPath) {
   return await listObjectsFromS3(key)
 }
 
-async function listObjectsFromS3 (prefix) {
+async function listObjectsFromS3 (prefix, excludeDirFromContents = true) {
   let data = await s3.send(new ListObjectsV2Command({Bucket: s3BucketName, Delimiter: '/', Prefix: prefix}))
 
   if (data.CommonPrefixes === undefined)
@@ -39363,7 +39363,7 @@ async function listObjectsFromS3 (prefix) {
 
   // There can be object which key is same to directory exactly.
   // We should erase it to make reasonable output to users.
-  if (prefix.substr(-1) === '/') {
+  if (excludeDirFromContents && prefix.substr(-1) === '/') {
     data.Contents = data.Contents.filter((content) => {
       return content.Key !== prefix
     })
@@ -39396,6 +39396,24 @@ exports.ls = async () => {
   return result
 }
 
+exports.mkdir = async (dirPath) => {
+  const absDirPath = getAbsolutePath(dirPath)
+  const isDirExists = await checkDirExists(absDirPath)
+
+  if (isDirExists)
+    throw new Error('directory already exists: ' + dirPath)
+  else {
+    const isFileExists = await checkFileExists(absDirPath)
+
+    if (isFileExists)
+      throw new Error('file exists: ' + dirPath)
+    else {
+      const key = getDirKeyForS3(absDirPath)
+      await s3.send(new PutObjectCommand({Bucket: s3BucketName, Key: key}))
+    }
+  }
+}
+
 exports.cat = async (filePath) => {
   const absFilePath = getAbsolutePath(filePath)
 
@@ -39403,7 +39421,7 @@ exports.cat = async (filePath) => {
     const key = getFileKeyForS3(absFilePath)
     const {Body} = await s3.send(new GetObjectCommand({Bucket: s3BucketName, Key: key}))
     const data = await Body.getReader().read()
-    const text = Buffer.from(data.value).toString('utf-8')
+    const text = data.value === undefined ? '' : Buffer.from(data.value).toString('utf-8')
     return $('<pre>').text(text)
   } catch (err) {
     if (err.message === 'NoSuchKey')
@@ -39608,6 +39626,14 @@ async function runCommand(){
         case 'ls':
           if (params.length === 0)
             cmdResult = await filesystem.ls()
+          break
+
+        case 'mkdir':
+          if (params.length > 0) {
+            for (const dirPath of params)
+              await filesystem.mkdir(dirPath)
+            cmdResult = $('')
+          }
           break
 
         case 'echo':

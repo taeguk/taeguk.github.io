@@ -126,6 +126,14 @@ async function runCommand(){
             cmdResult = await filesystem.ls()
           break
 
+        case 'mkdir':
+          if (params.length > 0) {
+            for (const dirPath of params)
+              await filesystem.mkdir(dirPath)
+            cmdResult = $('')
+          }
+          break
+
         case 'echo':
           const content = (cmdAndParams.slice(cmdAndParams.indexOf('echo') + 4)).trim()
           cmdResult = $('<pre>').text(content)
