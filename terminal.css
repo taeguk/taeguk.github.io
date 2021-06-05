@@ -142,7 +142,7 @@ pre, input, textarea, select {
   font-size: inherit;
 }
 
-.contact a {
+.contact a, .careers a {
   color: inherit;
 }
 
